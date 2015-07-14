@@ -60,16 +60,10 @@
 		<copy todir="${targetdir}/output" >
 			<fileset dir="${resourcedir}/output" includes="sequence?"/>
 		</copy>
-    	
-    	
+    	    	
         <mkdir dir="${targetdir}/suts"/>
     	<copy file="../suts/swtcalc/target/calc.jar" todir="${targetdir}/suts"/>
 
-    	<copy todir="${targetdir}/resources/.metadata">
-    	  <fileset dir="${resourcedir}/.metadata">
-    	    <exclude name="**/.svn/*"/>  
-    	  </fileset>  
-    	</copy>  
     </target>
 
     <target name="run" depends="jar">
