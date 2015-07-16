@@ -1,3 +1,4 @@
+![TESTAR Logo](/resources/logos/TESTAR.png)
 # TESTAR
 >Automated system testing of desktop, web and mobile applications at the GUI level
 
