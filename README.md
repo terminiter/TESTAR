@@ -1,5 +1,5 @@
-# TESTAR
->Automated system testing of desktop, web and mobile applications at the GUI level ![logo](/resources/logos/TESTAR.png)
+# ![logo](/resources/logos/TESTAR.png)
+>Automated system testing of desktop, web and mobile applications at the GUI level
 
 Test your system from the GUI:
 
