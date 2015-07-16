@@ -12,4 +12,4 @@ Test your system from the GUI:
 
 **TESTAR website**: http://webtestar.dsic.upv.es
 
-**TESTAR LICENSE**: TESTAR is distributed FREE of charge as an open source project under the [BSD-3 licence](http://opensource.org/licenses/BSD-3-Clause)
+**TESTAR LICENSE**: TESTAR is distributed FREE of charge as an open source project under the [BSD-3 license](http://opensource.org/licenses/BSD-3-Clause)
