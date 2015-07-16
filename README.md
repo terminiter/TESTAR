@@ -1,5 +1,4 @@
-![TESTAR Logo](/resources/logos/TESTAR.png)
-# TESTAR
+# TESTAR ![logo](/resources/logos/TESTAR.png)
 >Automated system testing of desktop, web and mobile applications at the GUI level
 
 Test your system from the GUI:
@@ -11,6 +10,6 @@ Test your system from the GUI:
 
 <hr>
 
-**TESTAR website**: http://webtestar.dsic.upv.es
+**website**: http://webtestar.dsic.upv.es
 
-**TESTAR LICENSE**: TESTAR is distributed FREE of charge as an open source project under the [BSD-3 license](http://opensource.org/licenses/BSD-3-Clause)
+**LICENSE**: TESTAR is distributed FREE of charge as an open source project under the [BSD-3 license](http://opensource.org/licenses/BSD-3-Clause)
