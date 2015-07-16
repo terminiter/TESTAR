@@ -11,5 +11,4 @@ Test your system from the GUI
 
 * Simple, automated, and open source: TESTAR!
 
-# LICENSE
-TESTAR is distributed FREE of charge as an open source project under the [BSD-3 licence](http://opensource.org/licenses/BSD-3-Clause)
+**LICENSE**: TESTAR is distributed FREE of charge as an open source project under the [BSD-3 licence](http://opensource.org/licenses/BSD-3-Clause)
