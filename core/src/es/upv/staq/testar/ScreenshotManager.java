@@ -69,6 +69,8 @@ public class ScreenshotManager extends Thread {
 			} catch (IOException e) {
 				//e.printStackTrace();
 				System.out.println("Could not save screenshot to: " + scrshotPath);
+			} catch (java.lang.NullPointerException npe){
+				System.out.println("Could not save screenshot to: " + scrshotPath);				
 			}
 		}
 		System.out.println("THREAD FINISHED!");
