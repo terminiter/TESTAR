@@ -8,15 +8,13 @@ Test your system from the GUI:
 * Just concentrate on the important stuff and let the tool do the rest for you!
 * Simple, automated, and open source: TESTAR!
 
-<hr>
-
 **website**: http://webtestar.dsic.upv.es
 
 **LICENSE**: TESTAR is distributed FREE of charge as an open source project under the [BSD-3 license](http://opensource.org/licenses/BSD-3-Clause)
 
 <hr>
 
-Releases:
+## Releases
 
 **TESTAR v1.1a**: https://github.com/STaQ-PROS-UPV/TESTAR/releases/tag/v1.1a
 Requirements:
@@ -24,3 +22,14 @@ Requirements:
 * tools/graphviz-2.38 (optional, dot.exe is used for .dot to .svg graphs conversion)
 
 **First public release**: https://github.com/STaQ-PROS-UPV/TESTAR/releases/tag/v1.0
+
+<hr>
+
+## Building source code
+
+Requirements: Windows 7, JDK 1.8, Apache Ant, Microsoft SDK 7.1
+
+How to:
+* build: run ant on testar folder (/testar> ant)
+* clean: run ant cleanall on testar folder
+* run: run testar.bat on testar/target folder
