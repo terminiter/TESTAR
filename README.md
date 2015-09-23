@@ -30,6 +30,6 @@ Requirements:
 Requirements: Windows 7, JDK 1.8, Apache Ant, Microsoft SDK 7.1
 
 How to:
-* build: run ant on testar folder (/testar> ant)
-* clean: run ant cleanall on testar folder
-* run: run testar.bat on testar/target folder
+* build: run "ant" on /testar
+* run: run "testar.bat" on /testar/target
+* clean: run "ant cleanall" on /testar
