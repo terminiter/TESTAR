@@ -28,6 +28,7 @@
 package org.fruit.monkey;
 
 import static org.fruit.monkey.ConfigTags.*;
+
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -38,9 +39,13 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
+
 import org.fruit.Pair;
 import org.fruit.UnProc;
 import org.fruit.Util;
+
+import es.upv.staq.testar.graph.Grapher;
 
 public class Main {
 	public static enum LogLevel{ 
@@ -55,6 +60,9 @@ public class Main {
 
 	public static void main(String[] args) throws IOException{
 		Settings settings = null;
+		//by fraalpe2
+		Locale.setDefault(Locale.ENGLISH);
+		
 		try{
 			settings = loadSettings(args, null);
 
@@ -76,21 +84,29 @@ public class Main {
 				System.exit(-1);
 			}
 
-			logln(Util.dateString("dd.MMMMM.yyyy HH:mm:ss"));
-			logln("Hello, I'm the FRUIT Monkey!" + Util.lineSep() + Util.lineSep() + "These are my settings:", Main.LogLevel.Critical);
+			//logln(Util.dateString("dd.MMMMM.yyyy HH:mm:ss"));
+			//logln("Hello, I'm the FRUIT Monkey!" + Util.lineSep() + Util.lineSep() + "These are my settings:", Main.LogLevel.Critical);
+			// start by urueda
+			logln(Util.dateString("dd.MMMMM.yyyy HH:mm:ss") + " TESTAR " + SettingsDialog.TESTAR_VERSION + " is running" + /*Util.lineSep() + Util.lineSep() +*/ " with the next settings:",Main.LogLevel.Critical);
+			logln("\n-- settings start ... --\n",Main.LogLevel.Critical);
+			// end by urueda
 			logln(settings.toString(), Main.LogLevel.Critical);
+			logln("-- ... settings end --\n",Main.LogLevel.Critical); // by urueda
 			List<String> cp = settings.get(MyClassPath);
 			URL[] classPath = new URL[cp.size()];
 			for(int i = 0; i < cp.size(); i++)
 				classPath[i] = new File(cp.get(i)).toURI().toURL();
 			URLClassLoader loader = new URLClassLoader(classPath);
 
-			logln("Trying to load monkey protocol in class '" + settings.get(ProtocolClass) + "' with class path '" + Util.toString(cp) + "'", Main.LogLevel.Debug);
+			//logln("Trying to load monkey protocol in class '" + settings.get(ProtocolClass) + "' with class path '" + Util.toString(cp) + "'", Main.LogLevel.Debug);
+			logln("Trying to load TESTAR protocol in class '" + settings.get(ProtocolClass) + "' with class path '" + Util.toString(cp) + "'", Main.LogLevel.Debug); // by urueda
 			@SuppressWarnings("unchecked")
 			UnProc<Settings> protocol = (UnProc<Settings>)loader.loadClass(settings.get(ProtocolClass)).getConstructor().newInstance();
-			logln("Monkey protocol loaded!", Main.LogLevel.Debug);
+			//logln("Monkey protocol loaded!", Main.LogLevel.Debug);
+			logln("TESTAR protocol loaded!", Main.LogLevel.Debug); // by urueda
 
-			logln("Starting monkey protocol ...", Main.LogLevel.Debug);
+			//logln("Starting monkey protocol ...", Main.LogLevel.Debug);
+			logln("Starting TESTAR protocol ...", Main.LogLevel.Debug); // by urueda
 			protocol.run(settings);
 		}catch (ConfigException ce){
 			logln("There is an issue with the configuration file: " + ce.getMessage(), Main.LogLevel.Critical);
@@ -99,12 +115,14 @@ public class Main {
 			t.printStackTrace(System.out);
 			t.printStackTrace(log);
 		}finally{
-			logln("Monkey stopped execution.", Main.LogLevel.Critical);
-			logln(Util.dateString("dd.MMMMM.yyyy HH:mm:ss"));
+			//logln("Monkey stopped execution.", Main.LogLevel.Critical);
+			//logln(Util.dateString("dd.MMMMM.yyyy HH:mm:ss"));
+			logln("TESTAR stopped execution at " + Util.dateString("dd.MMMMM.yyyy HH:mm:ss"), Main.LogLevel.Critical); // by urueda
 			if(log != null)
 				log.flush();
 			//if(settings != null && settings.get(ShowSettingsAfterTest))
 				//Runtime.getRuntime().exec("cmd /c start monkey.bat && exit");
+			Grapher.exit(); // by urueda
 			System.exit(0);
 		}
 	}

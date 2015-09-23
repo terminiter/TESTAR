@@ -34,10 +34,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
+
 import org.fruit.Assert;
 import org.fruit.FruitException;
 import org.fruit.Pair;
 import org.fruit.Util;
+import org.fruit.alayer.NoSuchTagException;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.TaggableBase;
 

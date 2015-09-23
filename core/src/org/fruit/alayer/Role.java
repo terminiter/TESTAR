@@ -33,8 +33,10 @@ import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
 import org.fruit.Assert;
 
 public final class Role implements Serializable {
@@ -53,6 +55,23 @@ public final class Role implements Serializable {
 		}
 		return false;
 	}
+	
+	// begin by urueda@STaQ
+    public static boolean isAnyOneOf(List<Widget> widgets, Role... oneOf) {
+        Role r;
+		for(Widget w : widgets) {
+            r = w.get(Tags.Role, null);
+            if (r != null) {
+                for (Role o : oneOf) {
+    			    if (r.isA(o)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    // end by urueda@STaQ	
 		
 	public static Role from(String name, Role... inheritFrom){
 		Assert.notNull(name, inheritFrom);

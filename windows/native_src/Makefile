@@ -1,7 +1,7 @@
 LIBS= ole32.lib user32.lib comsuppw.lib oleaut32.lib comctl32.lib gdi32.lib Msimg32.lib GDIplus.lib kernel32.lib psapi.lib
 
 INCLUDES= /I "$(JAVA_HOME)\include"\
-          /I "$(JAVA_HOME)\include\win32"\
+		  /I "$(JAVA_HOME)\include\win32"\
           /I "C:\Program Files\Microsoft SDKs\Windows\v7.1\Include"
           
 DLLFILE="..\bin\org\fruit\alayer\windows\windows.dll"

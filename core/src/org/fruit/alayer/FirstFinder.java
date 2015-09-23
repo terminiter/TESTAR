@@ -47,4 +47,11 @@ public final class FirstFinder implements Finder {
 	}
 	
 	public String toString(){ return "FirstFinder"; }
+
+	@Override
+	public Widget getCachedWidget() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 }

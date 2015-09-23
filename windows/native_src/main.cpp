@@ -1944,6 +1944,43 @@ JNI_SIG(jlongArray, WINAPI_NS(IUIAutomationElement_1GetRuntimeId)) (JNIEnv * env
 }
 
 
+// begin by urueda
+/* IUIAutomationElement_GetCurrentPropertyValue */
+JNI_SIG(jobject, WINAPI_NS(IUIAutomationElement_1GetCurrentPropertyValue)) (JNIEnv * env, jclass,
+		jlong pElement, jlong propertyId, jboolean fromCache){
+	
+	IUIAutomationElement* el = (IUIAutomationElement*) pElement;
+		
+    VARIANT var;
+	VariantInit(&var);
+	HRESULT hr = fromCache ? el->GetCachedPropertyValueEx(propertyId,TRUE,&var) :
+							 el->GetCurrentPropertyValue(propertyId,&var);
+
+	jobject ret = 0;
+
+	if (FAILED(hr))
+		return ret;
+	
+	jclass cls;
+	jmethodID mid;
+	
+	switch(var.vt){
+	case VT_BOOL:
+		cls = env->FindClass("java/lang/Boolean");
+		mid = env->GetStaticMethodID(cls, "valueOf", "(Z)Ljava/lang/Boolean;");
+		ret = env->CallStaticObjectMethod(cls, mid, var.boolVal);		
+		break;
+	case VT_R8:
+	    cls = env->FindClass("java/lang/Double");
+	    mid = env->GetStaticMethodID(cls, "valueOf", "(D)Ljava/lang/Double;");
+	    ret = env->CallStaticObjectMethod(cls, mid, var.dblVal);
+	    break;	
+	}
+	
+	return ret;
+}
+// end by urueda
+
 /* IUIAutomationElement_GetPropertyValueEx */
 JNI_SIG(jobject, WINAPI_NS(IUIAutomationElement_1GetPropertyValueEx)) (JNIEnv * env, jclass, 
 		jlong pElement, jlong propertyId, jboolean ignoreDefaultValue, jboolean fromCache){

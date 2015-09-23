@@ -28,6 +28,12 @@
 package org.fruit.alayer;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.fruit.alayer.actions.BriefActionRolesMap;
+
+import es.upv.staq.testar.CodingManager;
 
 /**
  * Actions take a system and a state as parameters and operate on the system (e.g. a left click). They
@@ -61,4 +67,75 @@ public interface Action extends Taggable, Serializable {
 	 * @throws ActionFailedException
 	 */
 	void run(SUT system, State state, double duration) throws ActionFailedException;
+		
+	/**
+	 * @param state A SUT state.
+	 * @param action A state' action.
+	 * @param tab A tabulator for indentation.
+	 * @return A string representation for the action.
+	 *   [0] = Extended representation
+	 *   [1] = Compact representation
+	 * @author urueda
+	 */
+	public static String[] getActionRepresentation(State state, Action action, String tab){
+		String[] returnS = new String[]{"",""};
+
+		Role actionRole = action.get(Tags.Role, null);
+		if (actionRole != null){
+			returnS[0] += tab + "ROLE = " + actionRole.toString() + "\n";
+			returnS[1] = String.format("%1$2s ",
+				actionRole == null ? "??" : BriefActionRolesMap.map.get(actionRole.toString()));
+		}
+
+		List<Finder> targets = action.get(Tags.Targets, null);
+		if (targets != null){
+			String title;
+			Role widgetRole;
+			Widget w;
+			for (Finder f : targets){
+				w = f.apply(state);
+				if (w != null){
+					returnS[0] += tab + "TARGET = " + w.getRepresentation("\t\t");				
+					widgetRole = w.get(Tags.Role, null);
+					title = w.get(Tags.Title, null);
+					returnS[1] += String.format("( %1$" + CodingManager.ID_LENTGH + "s, %2$11s, %3$s )",
+							CodingManager.codify(w),
+							widgetRole == null ? "???" : widgetRole.toString(),
+							title == null ? "\"\"" : title);
+				}
+			}
+		}
+			
+		String desc = action.get(Tags.Desc, null);
+		if (desc != null)
+			returnS[0] += tab + "DESCRIPTION = " + desc + "\n";
+
+		returnS[0] += tab + "TEXT = " + action.toString().replaceAll("\\r\\n|\\n", "\n\t\t") + "\n";
+		
+		String params = action.toParametersString()
+				.replaceAll("\\)\\(",",")
+				.replaceAll("\\(","")
+				.replaceAll("\\)","")
+				.replaceAll("BUTTON[1,3]","")
+				.replaceAll(",,","")
+				.replaceAll(", ",",");
+		returnS[1] += " [ " + (params.equals(",") ? "" : params + " ]");
+
+		return returnS;
+	}
+	
+	/**
+	 * Returns a short string representation for the action.
+	 * @return The short string.
+	 * @author urueda
+	 */
+	String toShortString();
+	
+	/**
+	 * Returns the parameters of the action.
+	 * @return A string representation of the action parameters.
+	 * @author urueda
+	 */
+	String toParametersString();
+	
 }

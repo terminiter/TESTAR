@@ -10,24 +10,30 @@
     <property name="jarfile" value="testar.jar"/>
 	<property name="coreJarFile" location="../core/target/core.jar"/>
 	<property name="winJarFile" location="../windows/target/windows.jar"/>
+	<property name="graphJarFile" location="../graph/target/graph.jar"/>
 	<property name="cmdParams" value="generate"/>
     <target name="all" depends="jar, doc"/>
 
 
     <!-- targets -->	
 	<target name="dependencies">
-		<depend srcdir="${src}" destdir="${bin}" closure="yes" classpath = "${coreJarFile};${winJarFile}" />
+		<depend srcdir="${src}" destdir="${bin}" closure="yes" classpath = "${coreJarFile};${winJarFile};${graphJarFile}" />
 	</target>
 	
     <target name="compile" depends="dependencies">
         <ant antfile="build.xml" dir="../core" target="jar" inheritAll="false"/>
+    	<ant antfile="build.xml" dir="../graph" target="jar" inheritAll="false"/>
         <ant antfile="build.xml" dir="../windows" target="jar" inheritAll="false"/>
         <ant antfile="build.xml" dir="../suts/swtcalc" target="jar" inheritAll="false"/>
         <mkdir dir="${bin}"/>
-        <javac classpath="${lib}/jsyntaxpane-0.9.5-b29.jar;${coreJarFile};{${winJarFile};${lib}/JNativeHook.jar" sourcepath="" srcdir="${src}" destdir="${bin}" failonerror="true" verbose="no" listfiles="no"
+        <javac classpath="${lib}/jsyntaxpane-0.9.5-b29.jar;${coreJarFile};{${winJarFile};${graphJarFile};${lib}/JNativeHook.jar" sourcepath="" srcdir="${src}" destdir="${bin}" failonerror="true" verbose="no" listfiles="no"
         	includeantruntime="false" debug="on" debuglevel="lines,vars,source"/>
     	<mkdir dir="${bin}/resources/icons"/>
 		<copy todir="${bin}/resources/icons" >
+	   		<fileset dir="${resourcedir}/icons/"/>
+		</copy>
+    	<!-- by urueda -->
+		<copy todir="${targetdir}/resources/icons" >
 	   		<fileset dir="${resourcedir}/icons/"/>
 		</copy>
     </target>
@@ -42,6 +48,9 @@
     	<zip destfile="${targetdir}/${jarfile}">
     	    <zipfileset src="${coreJarFile}"/>
     	    <zipfileset src="${winJarFile}"/>
+    		<zipfileset src="${graphJarFile}"/>
+    		<zipfileset src="../graph/lib/com.alexmerz.graphviz.jar"/>
+    		<zipfileset src="../graph/lib/jgrapht-jdk1.6.jar"/>
     		<zipfileset src = "${lib}/JNativeHook.jar"/>
     		<zipfileset src = "${lib}/jsyntaxpane-0.9.5-b29.jar"/>
     	    <zipfileset src="${targetdir}/intermediate.jar"/>
@@ -49,14 +58,34 @@
     	<delete file="${targetdir}/intermediate.jar"/>
     	<copy file="${resourcedir}/testar.bat" todir="${targetdir}"/>
     	
-    	<copy file="${resourcedir}/CustomProtocol.java" todir="${targetdir}"/>
-        <javac classpath="${targetdir}/${jarfile}" sourcepath="${targetdir}/CustomProtocol.java" srcdir="${targetdir}" destdir="${targetdir}" failonerror="true" verbose="no" listfiles="no"
+    	<!-- start by urueda -->
+    	<copy file="../windows/resources/msvcp100.dll" todir="${targetdir}"/>
+    	<copy file="../windows/resources/msvcr100.dll" todir="${targetdir}"/>
+    	<copy file="../LICENSE" todir="${targetdir}"/>
+    	<copy file="../VERSION" todir="${targetdir}"/>
+    	<copy file="../CHANGELOG" todir="${targetdir}"/>
+    	<!-- end by urueda -->
+    	
+    	<!-- wincalc -->
+    	
+    	<copy file="${resourcedir}/SUT/wincalc/test.settings" todir="${targetdir}"/>
+    	<copy file="${resourcedir}/SUT/wincalc/CustomProtocol.java" todir="${targetdir}"/>
+    	
+
+    	<!-- calc -->
+    	<!--
+    	<copy file="${resourcedir}/SUT/calc/test.settings" todir="${targetdir}"/>
+    	<copy file="${resourcedir}/SUT/calc/CustomProtocol.java" todir="${targetdir}"/>
+    	-->
+    	
+       <javac classpath="${targetdir}/${jarfile}" sourcepath="${targetdir}/*.java" srcdir="${targetdir}" destdir="${targetdir}" failonerror="true" verbose="no" listfiles="no"
         	includeantruntime="false" debug="on" debuglevel="lines,vars,source"/>
 
-    	<copy file="${resourcedir}/test.settings" todir="${targetdir}"/>
-        <mkdir dir="${targetdir}/resources"/>
+    	<mkdir dir="${targetdir}/resources"/>
         <mkdir dir="${targetdir}/output"/>
         <mkdir dir="${targetdir}/output/temp"/>
+    	<mkdir dir="${targetdir}/output/scrshots"/>
+    	<mkdir dir="${targetdir}/output/graphs"/>
 		<copy todir="${targetdir}/output" >
 			<fileset dir="${resourcedir}/output" includes="sequence?"/>
 		</copy>
@@ -70,7 +99,7 @@
         <exec dir="${targetdir}" executable="cmd" failonerror="true">
             <arg value="/q"/>
             <arg value="/c"/>
-            <arg value="rogue_user.bat"/>
+            <arg value="testar.bat"/>
         </exec>
     </target>
 
@@ -96,5 +125,6 @@
     <target name="cleanall" depends="dependencies, clean">
         <ant antfile="build.xml" dir="../core" target="clean" inheritAll="false"/>
         <ant antfile="build.xml" dir="../windows" target="clean" inheritAll="false"/>
+    	<ant antfile="build.xml" dir="../graph" target="clean" inheritAll="false"/>
     </target>
 </project>

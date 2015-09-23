@@ -30,9 +30,11 @@ package org.fruit.alayer.actions;
 import org.fruit.Assert;
 import org.fruit.Util;
 import org.fruit.alayer.Action;
+import org.fruit.alayer.Role;
 import org.fruit.alayer.State;
 import org.fruit.alayer.SUT;
 import org.fruit.alayer.TaggableBase;
+import org.fruit.alayer.Tags;
 
 /**
  * An action that simply waits a given amount of seconds.
@@ -61,4 +63,21 @@ public final class Wait extends TaggableBase implements Action {
 	public String toString(){
 		return "Wait for " + (oveheadDuration ? "exactly " : "") + waitTime + " seconds";
 	}	
+	
+	// by urueda
+	@Override
+	public String toShortString() {
+		Role r = get(Tags.Role, null);
+		if (r != null)
+			return r.toString();
+		else
+			return toString();
+	}
+
+	// by urueda
+	@Override
+	public String toParametersString() {
+		return "(" + waitTime + ")";
+	}
+	
 }

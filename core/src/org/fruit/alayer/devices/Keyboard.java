@@ -29,6 +29,6 @@ package org.fruit.alayer.devices;
 
 public interface Keyboard {	
 	void press(KBKeys k);
-	void release(KBKeys k);
+	void release(KBKeys k);	
 	void isPressed(KBKeys k);
 }

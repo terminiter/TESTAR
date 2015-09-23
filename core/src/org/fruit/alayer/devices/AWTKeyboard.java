@@ -45,7 +45,7 @@ public final class AWTKeyboard implements Keyboard {
 	}
 	
 	public String toString() { return "AWT Keyboard"; }
-	public void press(KBKeys k) { robot.keyPress(k.code());	}
+	public void press(KBKeys k) { robot.keyPress(k.code());	}	
 	public void release(KBKeys k) { robot.keyRelease(k.code());	}
 
 	public void isPressed(KBKeys k) {

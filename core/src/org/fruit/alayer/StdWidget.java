@@ -29,6 +29,8 @@ package org.fruit.alayer;
 
 import java.io.Serializable;
 
+import org.fruit.Drag;
+
 public class StdWidget extends TaggableBase implements Widget, Serializable {
 	private static final long serialVersionUID = -1508666976791323005L;
 		
@@ -57,4 +59,17 @@ public class StdWidget extends TaggableBase implements Widget, Serializable {
 	public Widget addChild() {
 		return null;
 	}
+
+	// by urueda
+	@Override
+	public Drag[] scrollDrags(double scrollArrowSize, double scrollThick) {
+		return null;
+	}
+	
+	// by urueda
+	@Override
+	public String getRepresentation(String tab){
+		return tab + "???";
+	}
+	
 }

@@ -25,110 +25,32 @@
 /**
  *  @author Sebastian Bauersfeld
  */
- package org.fruit.monkey;
-
-import static org.fruit.alayer.windows.UIARoles.*;
-
-import java.io.File;
-
-import java.util.Collections;
-
-import java.util.List;
+package org.fruit.monkey;
 
 import java.util.HashSet;
-
 import java.util.Set;
 
 import org.fruit.Assert;
-
-import org.fruit.Pair;
-
 import org.fruit.Util;
-
-import org.fruit.alayer.Action;
-
-import org.fruit.alayer.ActionBuildException;
-
-import org.fruit.alayer.ActionFailedException;
-import org.fruit.alayer.Color;
-import org.fruit.alayer.FillPattern;
-import org.fruit.alayer.Pen;
 import org.fruit.alayer.Point;
-import org.fruit.alayer.Role;
-
-import org.fruit.alayer.Roles;
-
-import org.fruit.alayer.State;
-
 import org.fruit.alayer.SUT;
-
-import org.fruit.alayer.ShapeVisualizer;
-import org.fruit.alayer.State;
-
-import org.fruit.alayer.StateBuildException;
-
-import org.fruit.alayer.StrokePattern;
-import org.fruit.alayer.SystemStartException;
-
 import org.fruit.alayer.Tags;
-
-import org.fruit.alayer.Verdict;
-
-import org.fruit.alayer.Visualizer;
 import org.fruit.alayer.Widget;
-
-import org.fruit.alayer.actions.AnnotatingActionCompiler;
-
-import org.fruit.alayer.actions.StdActionCompiler;
-
 import org.fruit.alayer.devices.KBKeys;
-
 import org.fruit.alayer.devices.MouseButtons;
 
-import static org.fruit.alayer.windows.UIATags.*;
-
-import static org.fruit.monkey.ConfigTags.*;
-
-import org.fruit.monkey.DefaultProtocol;
-
-import org.fruit.monkey.Settings;
-
-import org.fruit.monkey.ConfigTags;
-
-import org.fruit.alayer.Tags;
-import static org.fruit.alayer.Tags.NotResponding;
-import static org.fruit.alayer.Tags.IsRunning;
-import static org.fruit.alayer.Tags.RunningProcesses;
-import static org.fruit.alayer.Tags.SystemActivator;
-import static org.fruit.alayer.Tags.Blocked;
-import static org.fruit.alayer.Tags.Title;
-import static org.fruit.alayer.Tags.Foreground;
-import static org.fruit.alayer.Tags.Enabled;
-
-
-// by urueda@upvlc
+/**
+ * Utility protocol (provides enhancements).
+ * 
+ * @author Urko Rueda Molina (alias: urueda)
+ *
+ */
 public class ClickFilterLayerProtocol extends DefaultProtocol {
 
     private SUT sut = null;
 
     private boolean vkShiftPressed = false;
-    private Set<String> clickFilterOnDemand = new HashSet();
-
-	/**
-	 * This method is called when the Rogue User starts the System Under Test (SUT). The method should
-	 * take care of 
-	 *   1) starting the SUT (you can use the Rogue User's settings obtainable from <code>settings()</code> to find
-	 *      out what executable to run)
-	 *   2) bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
-	 *      the SUT's configuratio files etc.)
-	 *   3) waiting until the system is fully loaded and ready to be tested (with large systems, you might have to wait several
-	 *      seconds until they have finished loading)
-     * @return  a started SUT, ready to be tested.
-	 */
-	protected SUT startSystem() throws SystemStartException{
-        this.sut = super.startSystem();
-		return sut;
-	}
+    private Set<String> clickFilterOnDemand = new HashSet<String>();
 	
     @Override
     protected void keyDown(KBKeys key) {
@@ -138,7 +60,9 @@ public class ClickFilterLayerProtocol extends DefaultProtocol {
         }
     }
 
+    @Override
     protected void keyUp(KBKeys key) {
+    	super.keyUp(key);
         if (key == KBKeys.VK_SHIFT) {
             vkShiftPressed = false;
         }
@@ -146,6 +70,7 @@ public class ClickFilterLayerProtocol extends DefaultProtocol {
     
     @Override
 	protected void mouseDown(MouseButtons btn, double x, double y){
+    	super.mouseDown(btn, x, y);
         boolean leftM = btn == MouseButtons.BUTTON1, rightM = btn == MouseButtons.BUTTON3;
 		if (vkShiftPressed && (leftM || rightM)) {
 			Point cursor = mouse.cursor();

@@ -43,11 +43,16 @@ import jsyntaxpane.DefaultSyntaxKit;
 public class ProtocolEditor extends javax.swing.JDialog {
     private static final long serialVersionUID = 5922037291232012481L;
 
-    public ProtocolEditor() {
+    private String protocolClass; // by urueda
+    
+    //public ProtocolEditor() {
+    public ProtocolEditor(String protocolClass) { // by urueda
+    	this.protocolClass = protocolClass;
         DefaultSyntaxKit.initKit();
         initComponents();
         codeEditor.setContentType("text/java");
-        codeEditor.setText(Util.readFile(new File("./CustomProtocol.java")));
+        //codeEditor.setText(Util.readFile(new File("./CustomProtocol.java")));
+        codeEditor.setText(Util.readFile(new File("./" + protocolClass + ".java"))); // by urueda
     }
 
     private void initComponents() {
@@ -57,6 +62,9 @@ public class ProtocolEditor extends javax.swing.JDialog {
         jScrollPane2 = new javax.swing.JScrollPane();
         console = new javax.swing.JTextArea();
 
+        // by mimarmu1
+        setTitle("Protocol editor");      
+        
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setMinimumSize(new java.awt.Dimension(800, 400));
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -124,7 +132,8 @@ public class ProtocolEditor extends javax.swing.JDialog {
             console.update(console.getGraphics());
 
             File compileDir = new File(".");
-            Util.saveToFile(codeEditor.getText(), "./CustomProtocol.java");
+            //Util.saveToFile(codeEditor.getText(), "./CustomProtocol.java");
+            Util.saveToFile(codeEditor.getText(), "./" + this.protocolClass + ".java"); // by urueda
 
             JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
             if (compiler == null) {
@@ -180,7 +189,8 @@ public class ProtocolEditor extends javax.swing.JDialog {
 
     private void formWindowClosed(java.awt.event.WindowEvent evt) {                                  
         try {
-            Util.saveToFile(codeEditor.getText(), "./CustomProtocol.java");
+            //Util.saveToFile(codeEditor.getText(), "./CustomProtocol.java");
+            Util.saveToFile(codeEditor.getText(), "./" + this.protocolClass + ".java"); // by urueda
         } catch (IOException ioe) {
             System.out.println(ioe);
         }

@@ -1,4 +1,4 @@
-<project name="winapi" default="jar">
+<project name="core" default="jar">
     
     <!-- properties -->
     <property name="src" location="src/"/>

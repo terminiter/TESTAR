@@ -45,4 +45,12 @@ public interface Finder extends Serializable {
 	 * @throws WidgetNotFoundException if no widget has been found
 	 */
 	Widget apply(Widget start) throws WidgetNotFoundException;
+	
+	/**
+	 * Retrieves cached widget, if caching was activated. 
+	 * @return The widget, or 'null'.
+	 * @author urueda
+	 */
+	Widget getCachedWidget();
+	
 }

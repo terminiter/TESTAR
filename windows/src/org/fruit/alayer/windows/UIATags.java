@@ -74,6 +74,18 @@ public final class UIATags{
 	public static final Tag<Long> UIANativeWindowHandle = from("UIANativeWindowHandle", Long.class);
 	public static final Tag<Long> UIAOrientation = from("UIAOrientation", Long.class);
 	
+	// by urueda
+	public static final Tag<Boolean> UIAScrollPattern = from("UIAScrollPattern", Boolean.class);
+	//public static final Tag<int[]> UIAScrollbarInfo = from("UIAScrollbarInfo", int[].class);
+	//public static final Tag<int[]> UIAScrollbarInfoH = from("UIAScrollbarInfoH", int[].class);
+	//public static final Tag<int[]> UIAScrollbarInfoV = from("UIAScrollbarInfoV", int[].class);
+	public static final Tag<Boolean> UIAHorizontallyScrollable = from("UIAHorizontallyScrollable", Boolean.class);
+	public static final Tag<Boolean> UIAVerticallyScrollable = from("UIAVerticallyScrollable", Boolean.class);
+	public static final Tag<Double> UIAScrollHorizontalViewSize = from("UIAScrollHorizontalViewSize", Double.class);
+	public static final Tag<Double> UIAScrollVerticalViewSize = from("UIAScrollVerticalViewSize", Double.class);
+	public static final Tag<Double> UIAScrollHorizontalPercent = from("UIAScrollHorizontalPercent", Double.class);
+	public static final Tag<Double> UIAScrollVerticalPercent = from("UIAScrollVerticalPercent", Double.class);
+	
 	/**
 	 * Id of the process that this widget belongs to
 	 */

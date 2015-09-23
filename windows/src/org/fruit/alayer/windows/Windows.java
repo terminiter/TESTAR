@@ -801,7 +801,8 @@ public final class Windows{
 	public static native boolean IUIAutomationElement_get_IsKeyboardFocusable(long pElement, boolean fromCache);
 	public static native boolean IUIAutomationElement_get_IsOffscreen(long pElement, boolean fromCache);
 	public static native long[] IUIAutomationElement_get_BoundingRectangle(long pElement, boolean fromCache);	
-	public static native long IUIAutomationElement_GetPattern(long pElement, long patternId, boolean fromCache);	
+	public static native long IUIAutomationElement_GetPattern(long pElement, long patternId, boolean fromCache);
+	public static native Object IUIAutomationElement_GetCurrentPropertyValue(long pElement, long propertyId, boolean fromCache); // by urueda	
 	public static native Object IUIAutomationElement_GetPropertyValueEx(long pElement, long propertyId, boolean ignoreDefaultValue, boolean fromCache);
 	public static native long IUIAutomationElement_GetCachedChildren(long pElement);	
 	public static native long IUIAutomationElement_FindAll(long pElement, long treeScope, long pCondition) throws UIAException;

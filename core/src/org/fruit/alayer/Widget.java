@@ -29,6 +29,8 @@ package org.fruit.alayer;
 
 import java.io.Serializable;
 
+import org.fruit.Drag;
+
 /**
  * A Widget is usually a control element of an <code>SUT</code>.
  * Widgets have exactly one parent and can have several children.
@@ -46,4 +48,21 @@ public interface Widget extends Taggable, Serializable {
 	void remove();
 	void moveTo(Widget p, int idx);
 	Widget addChild();
+	
+	/**
+	 * For scrollable widgets, compute drag segments of scrolling options.
+	 * @param scrollArrowSize The size of scrolling arrows.
+	 * @param scrollThick The scroller thickness.
+	 * @return 'null' for non-scrollable widgets or a set of drags, from (x1,y1) to (x2,y2), otherwise.
+	 * @author: urueda
+	 */
+	Drag[] scrollDrags(double scrollArrowSize, double scrollThick);
+	
+	/**
+	 * @param A tabulator for indentation.
+	 * @return Computes a string representation for the widget.
+	 * @author urueda
+	 */
+	public String getRepresentation(String tab);
+	
 }

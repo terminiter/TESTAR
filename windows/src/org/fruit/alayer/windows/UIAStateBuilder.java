@@ -67,7 +67,7 @@ public final class UIAStateBuilder implements StateBuilder {
 
 	private void initialize(){
 		Windows.CoInitializeEx(0, Windows.COINIT_MULTITHREADED);
-		System.out.println(Windows.Get_CLSID_CUIAutomation_Ptr());
+		//System.out.println(Windows.Get_CLSID_CUIAutomation_Ptr());
 		pAutomation = Windows.CoCreateInstance(Windows.Get_CLSID_CUIAutomation_Ptr(), 0, Windows.CLSCTX_INPROC_SERVER, Windows.Get_IID_IUIAutomation_Ptr());
 
 		// scope and filter settings
@@ -192,6 +192,8 @@ public final class UIAStateBuilder implements StateBuilder {
 			// find all visible top level windows on the desktop
 			Iterable<Long> visibleTopLevelWindows = visibleTopLevelWindows();
 
+			UIAElement modalElement = null; // by urueda
+			
 			// descend the root windows which belong to our process, using UIAutomation
 			uiaRoot.children = new ArrayList<UIAElement>();
 			List<Long> ownedWindows = new ArrayList<Long>();
@@ -201,7 +203,8 @@ public final class UIAStateBuilder implements StateBuilder {
 				
 				if(include){
 					if(!owned)
-						uiaDescend(uiaCacheWindowTree(hwnd), uiaRoot);
+						//uiaDescend(uiaCacheWindowTree(hwnd), uiaRoot);
+						modalElement = uiaDescend(uiaCacheWindowTree(hwnd), uiaRoot); // by urueda
 					else
 						ownedWindows.add(hwnd);
 				}
@@ -209,16 +212,22 @@ public final class UIAStateBuilder implements StateBuilder {
 
 			// if UIAutomation missed an owned window, we'll collect it here
 			for(long hwnd : ownedWindows){				
-				if(!uiaRoot.hwndMap.containsKey(hwnd))
-					uiaDescend(uiaCacheWindowTree(hwnd), uiaRoot);					
+				if(!uiaRoot.hwndMap.containsKey(hwnd)){
+					//uiaDescend(uiaCacheWindowTree(hwnd), uiaRoot);
+					UIAElement modalE;
+					// begin by urueda
+					if ((modalE = uiaDescend(uiaCacheWindowTree(hwnd), uiaRoot)) != null)
+							modalElement = modalE;
+					// end by urueda
+				}
 			}
 
 			// set z-indices for the windows
 			int z = 0;
 			for(long hwnd : visibleTopLevelWindows){
 				long exStyle = Windows.GetWindowLong(hwnd, Windows.GWL_EXSTYLE);				
-				if((exStyle & Windows.WS_EX_NOACTIVATE) != 0)
-					System.out.println(hwnd  + "   " + Windows.GetWindowText(hwnd) + "   " + Windows.GetClassName(hwnd));
+				//if((exStyle & Windows.WS_EX_NOACTIVATE) != 0)
+				//	System.out.println(hwnd  + "   " + Windows.GetWindowText(hwnd) + "   " + Windows.GetClassName(hwnd));
 
 				UIAElement wnd = uiaRoot.hwndMap.get(hwnd);
 
@@ -243,6 +252,8 @@ public final class UIAStateBuilder implements StateBuilder {
 			calculateZIndices(uiaRoot, 0);
 			buildTLCMap(uiaRoot);
 			markBlockedElements(uiaRoot);
+
+			markBlockedElements(uiaRoot,modalElement); // by urueda		
 
 			return uiaRoot;
 		}
@@ -282,10 +293,14 @@ public final class UIAStateBuilder implements StateBuilder {
 				buildTLCMap(builder, el.children.get(i));
 		}
 
-		void uiaDescend(long uiaPtr, UIAElement parent){
+		//void uiaDescend(long uiaPtr, UIAElement parent){
+		UIAElement uiaDescend(long uiaPtr, UIAElement parent){ // by urueda (returns a modal widget if detectsed)
 			if(uiaPtr == 0)
-				return;
+				//return;
+				return null; // by urueda
 
+			UIAElement modalElement = null; // by urueda
+			
 			UIAElement el = new UIAElement(parent);
 			parent.children.add(el);
 
@@ -300,11 +315,11 @@ public final class UIAStateBuilder implements StateBuilder {
 			el.enabled = Windows.IUIAutomationElement_get_IsEnabled(uiaPtr, true);
 			el.name = Windows.IUIAutomationElement_get_Name(uiaPtr, true);
 			el.helpText = Windows.IUIAutomationElement_get_HelpText(uiaPtr, true); 
-			el.automationId = Windows.IUIAutomationElement_get_AutomationId(uiaPtr, true); 
+			el.automationId = Windows.IUIAutomationElement_get_AutomationId(uiaPtr, true);
 			el.className = Windows.IUIAutomationElement_get_ClassName(uiaPtr, true); 
 			el.providerDesc = Windows.IUIAutomationElement_get_ProviderDescription(uiaPtr, true); 
 			el.frameworkId = Windows.IUIAutomationElement_get_FrameworkId(uiaPtr, true); 
-			el.orientation = Windows.IUIAutomationElement_get_Orientation(uiaPtr, true); 
+			el.orientation = Windows.IUIAutomationElement_get_Orientation(uiaPtr, true);
 			el.hasKeyboardFocus = Windows.IUIAutomationElement_get_HasKeyboardFocus(uiaPtr, true); 
 			el.isKeyboardFocusable = Windows.IUIAutomationElement_get_IsKeyboardFocusable(uiaPtr, true);
 
@@ -321,6 +336,32 @@ public final class UIAStateBuilder implements StateBuilder {
 					Windows.IUnknown_Release(uiaWndPtr);
 				}
 			}
+			
+			// begin by urueda
+			if (!el.isModal && el.automationId != null &&
+				(el.automationId.contains("messagebox") || el.automationId.contains("window"))){ // try to detect potential modal window!
+					modalElement = markModal(el);
+			}
+			Object obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaPtr, Windows.UIA_IsScrollPatternAvailablePropertyId, false); //true); 
+			el.scrollPattern = obj instanceof Boolean ? ((Boolean)obj).booleanValue() : false;
+			if (el.scrollPattern){
+				//el.scrollbarInfo = Windows.GetScrollBarInfo((int)el.hwnd,Windows.OBJID_CLIENT);
+				//el.scrollbarInfoH = Windows.GetScrollBarInfo((int)el.hwnd,Windows.OBJID_HSCROLL);
+				//el.scrollbarInfoV = Windows.GetScrollBarInfo((int)el.hwnd,Windows.OBJID_VSCROLL);
+				obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaPtr,  Windows.UIA_ScrollHorizontallyScrollablePropertyId, false);
+				el.hScroll = obj instanceof Boolean ? ((Boolean)obj).booleanValue() : false;
+				obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaPtr,  Windows.UIA_ScrollVerticallyScrollablePropertyId, false);
+				el.vScroll = obj instanceof Boolean ? ((Boolean)obj).booleanValue() : false;
+				obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaPtr, Windows.UIA_ScrollHorizontalViewSizePropertyId, false);
+				el.hScrollViewSize = obj instanceof Double ? ((Double)obj).doubleValue() : -1.0;
+				obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaPtr, Windows.UIA_ScrollVerticalViewSizePropertyId, false);
+				el.vScrollViewSize = obj instanceof Double ? ((Double)obj).doubleValue() : -1.0;;
+				obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaPtr, Windows.UIA_ScrollHorizontalScrollPercentPropertyId, false);
+				el.hScrollPercent = obj instanceof Double ? ((Double)obj).doubleValue() : -1.0;
+				obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaPtr, Windows.UIA_ScrollVerticalScrollPercentPropertyId, false);
+				el.vScrollPercent = obj instanceof Double ? ((Double)obj).doubleValue() : -1.0;
+			}
+			// end by urueda	
 
 			// descend children
 			long uiaChildrenPtr = Windows.IUIAutomationElement_GetCachedChildren(uiaPtr);
@@ -335,20 +376,52 @@ public final class UIAStateBuilder implements StateBuilder {
 					for(int i = 0; i < count; i++){
 						long ptrChild = Windows.IUIAutomationElementArray_GetElement(uiaChildrenPtr, i);
 						if(ptrChild != 0){
-							uiaDescend(ptrChild, el);
+							//uiaDescend(ptrChild, el);
+							// begin by urueda
+							UIAElement modalE;
+							if ((modalE = uiaDescend(ptrChild, el)) != null && modalElement == null) // parent-modal is preferred to child-modal
+								modalElement = modalE;
+							// end by urueda							
 						}
 					}
 				}
 				Windows.IUnknown_Release(uiaChildrenPtr);
 			}
+			
+			return modalElement; // by urueda
 		}
 
-
+		// by urueda (mark a proper widget as modal)
+		private UIAElement markModal(UIAElement element){
+			if (element == null)
+				return null; // no proper widget found to mark as modal
+			else if (element.ctrlId != Windows.UIA_WindowControlTypeId && element.ctrlId != Windows.UIA_PaneControlTypeId &&
+					 element.ctrlId != Windows.UIA_GroupControlTypeId){
+				return markModal(element.parent);
+			}
+			else {
+				element.isModal = true;
+				return element;
+			}
+		}
+		
 		private void markBlockedElements(UIAElement element){
 			for(UIAElement c : element.children){
 				if(element.blocked && !(c.ctrlId == Windows.UIA_WindowControlTypeId && c.blocked == false))
 					c.blocked = true;
 				markBlockedElements(c);
+			}
+		}
+		
+		// by urueda
+		private void markBlockedElements(UIAElement element, UIAElement modalElement){
+			if (modalElement != null){
+				for(UIAElement c : element.children){
+					if (c != modalElement){
+						c.blocked = true;
+						markBlockedElements(c,modalElement);
+					}
+				}				
 			}
 		}
 

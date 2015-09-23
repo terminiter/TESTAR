@@ -57,6 +57,7 @@ public final class ActionRoles {
 	RDoubleClickAt = Role.from("RDoubleClickAt", DoubleClickAt, RightClick),
 	Type = Role.from("Type", HitKey),
 	ClickTypeInto = Role.from("ClickTypeInto", ClickAt, Type),
+	DropDown = Role.from("DropDown", Click, KeyDown), // /by mimarmu1
 	Drag = Role.from("Drag", MouseDown, MouseUp, MouseMove),
 	LeftDrag = Role.from("LeftDrag", Drag);
 }

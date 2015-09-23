@@ -55,6 +55,10 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
 			.setFillPattern(FillPattern.None).setStrokeWidth(5).build();
 	private static final Pen DragDropPen = Pen.newPen().setColor(Color.CornflowerBlue)
 			.setFillPattern(FillPattern.None).setStrokeWidth(2).setStrokeCaps(StrokeCaps._Arrow).build();
+
+	// by mimarmu1
+	private static final Pen DropdownPen = Pen.newPen().setColor(Color.Gold).setFillPattern(FillPattern.None).setStrokeWidth(3).setFontSize(26).build();	
+
 	private static final Pen TypePen = Pen.newPen().setColor(Color.Blue)
 			.setFillPattern(FillPattern.None).setStrokeWidth(3).setFontSize(26).build();
 	
@@ -64,13 +68,15 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
 		super(abstractor);
 	}
 	
+	@Override // by urueda
 	public Action leftClick(){
 		Action ret = super.leftClick();
 		ret.set(Tags.Desc, "Left Click");
 		ret.set(Tags.Role, ActionRoles.LeftClick);
 		return ret;
 	}
-	
+
+	@Override // by urueda
 	public Action rightClick(){
 		Action ret = super.rightClick();
 		ret.set(Tags.Desc, "Right Click");
@@ -78,6 +84,7 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
 		return ret;
 	}
 
+	@Override // by urueda
 	public Action leftDoubleClick(){
 		Action ret = super.leftDoubleClick();
 		ret.set(Tags.Desc, "Left Double Click");
@@ -85,13 +92,16 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
 		return ret;
 	}
 
+	@Override // by urueda
 	public Action leftClickAt(Widget widget, double relX, double relY){
-		Action ret = leftClickAt(new WidgetPosition(abstractor.apply(widget), Tags.Shape, relX, relY, true));
+		//Action ret = leftClickAt(new WidgetPosition(wf, Tags.Shape, relX, relY, true));
+		Action ret = super.leftClickAt(widget, relX, relY); // by urueda
 		ret.set(Tags.Desc, "Left Click at '" + widget.get(Tags.Desc, "<no description>") + "'");
-		ret.set(Tags.Targets, Util.newArrayList(abstractor.apply(widget)));
+		//ret.set(Tags.Targets, Util.newArrayList(wf));
 		return ret;
 	}
-	
+
+	@Override // by urueda
 	public Action leftClickAt(Position position){
 		Action ret = super.leftClickAt(position);
 		ret.set(Tags.Desc, "Left Click at '" + position.toString() + "'");
@@ -100,6 +110,7 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
 		return ret;
 	}
 
+	@Override // by urueda
 	public Action rightClickAt(Position position){
 		Action ret = super.rightClickAt(position);
 		ret.set(Tags.Desc, "Right Click at '" + position.toString() + "'");
@@ -108,6 +119,7 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
 		return ret;
 	}
 
+	@Override // by urueda
 	public Action leftDoubleClickAt(Position position){
 		Action ret = super.leftDoubleClickAt(position);
 		ret.set(Tags.Desc, "Double-Click at '" + position.toString() + "'");
@@ -116,12 +128,15 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
 		return ret;
 	}
 
+	@Override // by urueda
 	public Action clickTypeInto(final Widget widget, double relX, double relY, final String text){
-		Action ret = clickTypeInto(new WidgetPosition(abstractor.apply(widget), Tags.Shape, relX, relY, true), text);
+		//Action ret = clickTypeInto(new WidgetPosition(abstractor.apply(widget), Tags.Shape, relX, relY, true), text);
+		Action ret = super.clickTypeInto(widget, relX, relY, text); // by urueda
 		ret.set(Tags.Desc, "Type '" + Util.abbreviate(text, 5, "...") + "' into '" + widget.get(Tags.Desc, "<no description>" + "'"));
 		return ret;
 	}
 
+	@Override // by urueda
 	public Action clickTypeInto(final Position position, final String text){
 		Action ret = super.clickTypeInto(position, text);
 		ret.set(Tags.Visualizer, new TextVisualizer(position, Util.abbreviate(text, 5, "..."), TypePen));
@@ -130,6 +145,17 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
 		return ret;
 	}
 	
+	//by mimarmu1
+	@Override // by urueda
+	public Action dropDownAt(Position position){
+	  Action ret = super.dropDownAt(position);
+	  ret.set(Tags.Desc, "Dropdown at '" + position.toString() + "'");
+	  ret.set(Tags.Visualizer, new EllipseVisualizer(position, DropdownPen, 30, 30));
+	  ret.set(Tags.Role, ActionRoles.DropDown);
+	  return ret;
+	}	
+	
+	@Override // by urueda
 	public Action dragFromTo(Position from, Position to){
 		Action ret = super.dragFromTo(from, to);
 		ret.set(Tags.Visualizer, new TrajectoryVisualizer(DragDropPen, from, new OrthogonalPosition(from, to, 0.2, 0), to));
@@ -138,26 +164,29 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
 		return ret;
 	}
 	
+	@Override // by urueda
 	public Action hitKey(KBKeys key){
 		Action ret = super.hitKey(key);
 		ret.set(Tags.Desc, "Hit Key " + key);
 		ret.set(Tags.Role, ActionRoles.HitKey);		
 		return ret;
-	}
+	}	
 	
-	
+	@Override // by urueda
 	public Action killProcessByPID(long pid, double timeToWaitBeforeKilling){
 		Action ret = super.killProcessByPID(pid, timeToWaitBeforeKilling);
 		ret.set(Tags.Desc, "Kill Process with pid: " + pid + ".");
 		return ret;
 	}
 	
+	@Override // by urueda
 	public Action killProcessByName(String name, double timeToWaitBeforeKilling){
 		Action ret = super.killProcessByName(name, timeToWaitBeforeKilling);
 		ret.set(Tags.Desc, "Kill Process with name '" + name + "'");
 		return ret;
 	}
 	
+	@Override // by urueda
 	public Action activateSystem(){	
 		Action ret = super.activateSystem();
 		ret.set(Tags.Desc, "Bring the system to the foreground.");

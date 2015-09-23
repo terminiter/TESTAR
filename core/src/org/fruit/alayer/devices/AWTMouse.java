@@ -47,9 +47,16 @@ public final class AWTMouse implements Mouse {
 	}
 
 	public String toString() { return "AWT Mouse"; }
-	public void press(MouseButtons k) { robot.mousePress(k.code()); }
-	public void release(MouseButtons k) { robot.mouseRelease(k.code()); }
 
+	public void press(MouseButtons k) { 
+		//System.out.println("lc down [AWTMouse]");
+		robot.mousePress(k.code());}
+
+	public void release(MouseButtons k) { 
+		//System.out.println("lc up [AWTMouse]");
+		robot.mouseRelease(k.code());
+	}	
+	
 	public void isPressed(MouseButtons k) {
 		throw new UnsupportedOperationException("AWT Mouse cannot poll the mouse's state!");
 	}

@@ -46,15 +46,28 @@ import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.ToolTipManager;
+
 import org.fruit.Pair;
 import org.fruit.Util;
+import org.fruit.alayer.actions.AnnotatingActionCompiler;
+import org.fruit.alayer.actions.StdActionCompiler;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.GroupLayout;
+import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.JLabel;
+import java.awt.Color;
 
 public class SettingsDialog extends javax.swing.JFrame {
+	
 	private static final long serialVersionUID = 5156320008281200950L;
+	
+	public static final String TESTAR_VERSION = "1.1a";
+	
 	String settingsFile;
 	Settings settings, ret;
 
 	public SettingsDialog() throws IOException {
+		getContentPane().setBackground(Color.WHITE);
 		try {
 			for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
 				if ("Nimbus".equals(info.getName())) {
@@ -72,6 +85,9 @@ public class SettingsDialog extends javax.swing.JFrame {
 			java.util.logging.Logger.getLogger(SettingsDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
 		}
 
+		//By: mimarmu1
+		this.setIconImage(loadIcon("/resources/icons/logos/TESTAR.jpg"));
+		
 		ToolTipManager.sharedInstance().setDismissDelay(25000);
 		ToolTipManager.sharedInstance().setInitialDelay(100);
 		initComponents();
@@ -242,8 +258,8 @@ public class SettingsDialog extends javax.swing.JFrame {
 		btnGenerate = new javax.swing.JButton();
 		btnSpy = new javax.swing.JButton();
 		jTabbedPane1 = new javax.swing.JTabbedPane();
-		aboutPanel = new javax.swing.JPanel();
 		jPanel1 = new javax.swing.JPanel();
+		//jPanel1.setBackground(Color.WHITE);
 		txtSutPath = new javax.swing.JTextField();
 		jLabel1 = new javax.swing.JLabel();
 		btnSutPath = new javax.swing.JButton();
@@ -261,6 +277,7 @@ public class SettingsDialog extends javax.swing.JFrame {
 		jLabel25 = new javax.swing.JLabel();
 		spnVerbosity = new javax.swing.JSpinner();
 		jPanel4 = new javax.swing.JPanel();
+		//jPanel4.setBackground(Color.WHITE);
 		jLabel10 = new javax.swing.JLabel();
 		jScrollPane2 = new javax.swing.JScrollPane();
 		txtSuspTitles = new javax.swing.JTextArea();
@@ -268,6 +285,7 @@ public class SettingsDialog extends javax.swing.JFrame {
 		spnFreezeTime = new javax.swing.JSpinner();
 		jLabel14 = new javax.swing.JLabel();
 		jPanel5 = new javax.swing.JPanel();
+		//jPanel5.setBackground(Color.WHITE);
 		jLabel11 = new javax.swing.JLabel();
 		jScrollPane1 = new javax.swing.JScrollPane();
 		txtClickFilter = new javax.swing.JTextArea();
@@ -275,11 +293,10 @@ public class SettingsDialog extends javax.swing.JFrame {
 		txtProcessFilter = new javax.swing.JTextArea();
 		jLabel12 = new javax.swing.JLabel();
 		jPanel2 = new javax.swing.JPanel();
+		//jPanel2.setBackground(Color.WHITE);
 		spnActionDuration = new javax.swing.JSpinner();
 		jLabel2 = new javax.swing.JLabel();
 		jLabel3 = new javax.swing.JLabel();
-		jLabel26 = new javax.swing.JLabel();
-		jLabel27 = new javax.swing.JLabel();
 		jLabel4 = new javax.swing.JLabel();
 		spnActionWaitTime = new javax.swing.JSpinner();
 		jLabel5 = new javax.swing.JLabel();
@@ -287,12 +304,12 @@ public class SettingsDialog extends javax.swing.JFrame {
 		spnSutStartupTime = new javax.swing.JSpinner();
 		jLabel7 = new javax.swing.JLabel();
 		jLabel22 = new javax.swing.JLabel();
-		jLabel28 = new javax.swing.JLabel();
 		spnMaxTime = new javax.swing.JSpinner();
 		jLabel23 = new javax.swing.JLabel();
 		jLabel24 = new javax.swing.JLabel();
 		checkUseRecordedTimes = new javax.swing.JCheckBox();
 		jPanel3 = new javax.swing.JPanel();
+		//jPanel3.setBackground(Color.WHITE);
 		jLabel8 = new javax.swing.JLabel();
 		txtOutputDir = new javax.swing.JTextField();
 		btnSetOutputDir = new javax.swing.JButton();
@@ -409,6 +426,57 @@ public class SettingsDialog extends javax.swing.JFrame {
 				btnSaveSettingsAsActionPerformed(evt);
 			}
 		});
+		aboutPanel = new javax.swing.JPanel();
+		aboutPanel.setBackground(Color.WHITE);
+		jLabel26 = new javax.swing.JLabel();
+		jLabel27 = new javax.swing.JLabel();
+		jLabel28 = new javax.swing.JLabel();
+		
+				
+		
+		       // jLabel26.setIcon(new ImageIcon(loadIcon("/resources/icons/logos/TESTAR.jpg")));  //("/resources/icons/fittest_logo.png")));
+		        jLabel26.setIcon(new ImageIcon(loadIcon("/resources/icons/logos/testar_logo.png")));
+		        jLabel27.setIcon(new ImageIcon(loadIcon("/resources/icons/logos/pros.png"))); //("/resources/icons/fp7_logo.png")));
+		        
+		                jLabel28.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+		                jLabel28.setText("TESTAR " + TESTAR_VERSION);
+		                
+		                JLabel lblUPVLogo = new JLabel();
+		                lblUPVLogo.setIcon(new ImageIcon(loadIcon("/resources/icons/logos/upv.png"))); //("/resources/icons/fp7_logo.png")));
+		                
+		                
+		                        javax.swing.GroupLayout aboutPanelLayout = new javax.swing.GroupLayout(aboutPanel);
+		                        aboutPanelLayout.setHorizontalGroup(
+		                        	aboutPanelLayout.createParallelGroup(Alignment.LEADING)
+		                        		.addGroup(aboutPanelLayout.createSequentialGroup()
+		                        			.addGroup(aboutPanelLayout.createParallelGroup(Alignment.LEADING)
+		                        				.addGroup(aboutPanelLayout.createSequentialGroup()
+		                        					.addContainerGap()
+		                        					.addComponent(jLabel27, GroupLayout.PREFERRED_SIZE, 144, GroupLayout.PREFERRED_SIZE)
+		                        					.addGap(40)
+		                        					.addComponent(jLabel28, GroupLayout.PREFERRED_SIZE, 90, GroupLayout.PREFERRED_SIZE)
+		                        					.addPreferredGap(ComponentPlacement.RELATED, 53, Short.MAX_VALUE)
+		                        					.addComponent(lblUPVLogo, GroupLayout.PREFERRED_SIZE, 153, GroupLayout.PREFERRED_SIZE))
+		                        				.addGroup(aboutPanelLayout.createSequentialGroup()
+		                        					.addGap(144)
+		                        					.addComponent(jLabel26, GroupLayout.PREFERRED_SIZE, 186, GroupLayout.PREFERRED_SIZE)))
+		                        			.addContainerGap())
+		                        );
+		                        aboutPanelLayout.setVerticalGroup(
+		                        	aboutPanelLayout.createParallelGroup(Alignment.TRAILING)
+		                        		.addGroup(aboutPanelLayout.createSequentialGroup()
+		                        			.addGap(87)
+		                        			.addComponent(jLabel26, GroupLayout.PREFERRED_SIZE, 75, GroupLayout.PREFERRED_SIZE)
+		                        			.addPreferredGap(ComponentPlacement.RELATED, 126, Short.MAX_VALUE)
+		                        			.addGroup(aboutPanelLayout.createParallelGroup(Alignment.TRAILING)
+		                        				.addComponent(lblUPVLogo, GroupLayout.PREFERRED_SIZE, 53, GroupLayout.PREFERRED_SIZE)
+		                        				.addComponent(jLabel27, GroupLayout.PREFERRED_SIZE, 56, GroupLayout.PREFERRED_SIZE)
+		                        				.addComponent(jLabel28, GroupLayout.PREFERRED_SIZE, 29, GroupLayout.PREFERRED_SIZE)))
+		                        );
+		                        aboutPanel.setLayout(aboutPanelLayout);
+		                        
+		                                
+		                        		jTabbedPane1.addTab("About", aboutPanel);
 
 		jLabel21.setText("Stop Generation on Fault:");
 		jLabel21.setToolTipText("<html>\nStop sequence generation on fault: If the RU detects and error, it will immediately stop sequence generation.\n</html>");
@@ -502,48 +570,6 @@ public class SettingsDialog extends javax.swing.JFrame {
 																				.addComponent(btnLoadSettings, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 																				.addComponent(btnEditProtocol, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
 				);
-
-		
-
-        jLabel26.setIcon(new ImageIcon(loadIcon("/resources/icons/logos/TESTAR.jpg")));  //("/resources/icons/fittest_logo.png")));
-        jLabel27.setIcon(new ImageIcon(loadIcon("/resources/icons/logos/PROS-UPV.jpg"))); //("/resources/icons/fp7_logo.png")));
-
-        jLabel28.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        jLabel28.setText("TESTAR v1.0"); //jLabel28.setText("Rogue User v1.0");
-
-        javax.swing.GroupLayout aboutPanelLayout = new javax.swing.GroupLayout(aboutPanel);
-        aboutPanel.setLayout(aboutPanelLayout);
-        aboutPanelLayout.setHorizontalGroup(
-            aboutPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(aboutPanelLayout.createSequentialGroup()
-                .addGroup(aboutPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(aboutPanelLayout.createSequentialGroup()
-                        .addGap(88, 88, 88)
-                        .addComponent(jLabel27, javax.swing.GroupLayout.PREFERRED_SIZE, 270, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(jLabel26, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(aboutPanelLayout.createSequentialGroup()
-                        .addGap(177, 177, 177)
-                        .addComponent(jLabel28, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(44, Short.MAX_VALUE))
-        );
-        aboutPanelLayout.setVerticalGroup(
-            aboutPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(aboutPanelLayout.createSequentialGroup()
-                .addGap(22, 22, 22)
-                .addComponent(jLabel28, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGroup(aboutPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(aboutPanelLayout.createSequentialGroup()
-                        .addGap(33, 33, 33)
-                        .addComponent(jLabel27, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(aboutPanelLayout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jLabel26, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(92, Short.MAX_VALUE))
-        );
-
-        
-		jTabbedPane1.addTab("About", aboutPanel);
 
 		jTabbedPane1.addTab("General Settings", jPanel1);
 
@@ -1041,13 +1067,17 @@ public class SettingsDialog extends javax.swing.JFrame {
 
 		pack();
 		Dimension scrDim = Toolkit.getDefaultToolkit().getScreenSize();
-		setBounds((int) scrDim.getWidth() / 2 - getWidth() / 2, (int) scrDim.getHeight() / 3 - getHeight() / 2, getWidth(), getHeight());
+		//By mimarmu1 
+		setBounds((int) scrDim.getWidth() / 2 - getWidth() / 2, (int) scrDim.getHeight() / 2 - getHeight() / 2, getWidth(), getHeight());
 	}// </editor-fold>//GEN-END:initComponents
 
 	private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
 	}//GEN-LAST:event_jButton1ActionPerformed
 
 	private void btnGenerateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGenerateActionPerformed
+		//By: mimarmu1
+		//If true, kill the browser process
+		sutIsAWebApp();
 		start(AbstractProtocol.Modes.Generate);
 	}//GEN-LAST:event_btnGenerateActionPerformed
 
@@ -1073,6 +1103,9 @@ public class SettingsDialog extends javax.swing.JFrame {
 	}//GEN-LAST:event_btnSetTempDirActionPerformed
 
 	private void btnSpyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSpyActionPerformed
+		//By mimarmu1
+		//If true, kill the browser process
+		sutIsAWebApp();				
 		start(AbstractProtocol.Modes.Spy);
 	}//GEN-LAST:event_btnSpyActionPerformed
 
@@ -1104,7 +1137,11 @@ public class SettingsDialog extends javax.swing.JFrame {
 		JFileChooser fd = new JFileChooser();
 		fd.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		fd.setCurrentDirectory(new File(settingsFile).getParentFile());
-
+		
+		//By: mimarmu1
+		fd.setApproveButtonText("Save"); 
+		fd.setDialogTitle("Save"); 
+		
 		if (fd.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
 			String file = fd.getSelectedFile().getAbsolutePath();
 			extractInformation(settings);
@@ -1119,7 +1156,8 @@ public class SettingsDialog extends javax.swing.JFrame {
 	}//GEN-LAST:event_btnSaveSettingsAsActionPerformed
 
 	private void btnEditProtocolActionPerformed(java.awt.event.ActionEvent evt) {
-        JDialog dialog = new ProtocolEditor();
+        //JDialog dialog = new ProtocolEditor();
+        JDialog dialog = new ProtocolEditor(settings.get(ConfigTags.ProtocolClass)); // by urueda        		
         dialog.setModalityType(JDialog.ModalityType.APPLICATION_MODAL);
         //dialog.setModalExclusionType(JDialog.ModalExclusionType.NO_EXCLUDE);
         dialog.setVisible(true);
@@ -1129,7 +1167,10 @@ public class SettingsDialog extends javax.swing.JFrame {
 		JFileChooser fd = new JFileChooser();
 		fd.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		fd.setCurrentDirectory(new File(settingsFile).getParentFile());
-
+		//By: mimarmu1
+		fd.setDialogTitle("Load"); 
+		fd.setApproveButtonText("Load"); 
+		
 		if (fd.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
 			String file = fd.getSelectedFile().getAbsolutePath();
 			try {
@@ -1180,6 +1221,35 @@ public class SettingsDialog extends javax.swing.JFrame {
 			}
 		}
 	}//GEN-LAST:event_tblDeleteMouseClicked
+	
+	//By mimarmu1
+	//Kill browser's process before starting the SUT
+	private void killProcess(String name){
+		Process child;
+		
+		try{
+			child = Runtime.getRuntime().exec("tskill " + name);
+			child.waitFor();
+			if(child.exitValue()==0){
+				System.out.println("SettingsDialoge - " + name + " killed");
+			}else{
+				System.out.println("SettingsDialoge - Cannot kill " + name);
+			}
+		}catch (IOException ex){
+			System.out.println("SettingsDialoge - Cannot kill " + name);
+		}catch (InterruptedException ie){
+			System.out.println("SettingsDialoge - Cannot kill " + name);
+		}
+	}
+	
+	private void sutIsAWebApp(){
+		String sutPath = txtSutPath.getText();
+		if(sutPath.contains("iexplore.exe")){
+			killProcess("iexplore");
+		}else if(sutPath.contains("firefox.exe")){
+			killProcess("firefox");
+		}
+	}
 
 	private javax.swing.JButton btnGenerate;
 	private javax.swing.JButton btnEditProtocol;

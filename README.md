@@ -14,4 +14,13 @@ Test your system from the GUI:
 
 **LICENSE**: TESTAR is distributed FREE of charge as an open source project under the [BSD-3 license](http://opensource.org/licenses/BSD-3-Clause)
 
+<hr>
+
+Releases:
+
+**TESTAR v1.1a**: https://github.com/STaQ-PROS-UPV/TESTAR/releases/tag/v1.1a
+Requirements:
+* Java JDK/JRE 1.8/1.7 x64 (protocol compilation will require JDK)
+* tools/graphviz-2.38 (optional, dot.exe is used for .dot to .svg graphs conversion)
+
 **First public release**: https://github.com/STaQ-PROS-UPV/TESTAR/releases/tag/v1.0

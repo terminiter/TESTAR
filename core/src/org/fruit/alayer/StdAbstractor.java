@@ -121,13 +121,19 @@ public final class StdAbstractor implements Abstractor {
 				score += 1.0 / (Math.abs(path1[path1.length - 1 - i] - path2[path2.length - 1 - i]) + 1.0);
 			return score;
 		}
+
+		@Override
+		public Widget getCachedWidget() { // by urueda
+			return cachedWidget;
+		}
 		
 	}
 	
 	private final boolean cache;
 	private final double minSimilarity;
 	
-	public StdAbstractor(){	this(false, 0.5); }
+	//public StdAbstractor(){	this(false, 0.5); }
+	public StdAbstractor(){	this(true, 0.5); } // by urueda
 	
 	public StdAbstractor(boolean cacheWidgetInFinder, double minSimilarity){
 		this.cache = cacheWidgetInFinder;

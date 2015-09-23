@@ -67,7 +67,8 @@ public class StdActionCompiler {
 
 	public Action leftDoubleClick(){
 		Action lc = leftClick();
-		return new CompoundAction.Builder().add(lc, 0).
+		//return new CompoundAction.Builder().add(lc, 0).
+		return new CompoundAction.Builder().add(lc, 0).add(NOP, 0.1).	
 				add(lc, 0).add(NOP, 1).build();
 	}
 
@@ -109,6 +110,7 @@ public class StdActionCompiler {
 	public Action rightClickAt(Widget w, double relX, double relY){
 		Finder wf = abstractor.apply(w);
 		Action ret = rightClickAt(new WidgetPosition(wf, Tags.Shape, relX, relY, true));
+		ret.set(Tags.Desc, "Right Click at '" + w.get(Tags.Desc, "<no description>") + "'"); // by urueda		
 		ret.set(Tags.Targets, Util.newArrayList(wf));
 		return ret;
 	}
@@ -133,6 +135,30 @@ public class StdActionCompiler {
 		ret.set(Tags.Targets, Util.newArrayList(wf));
 		return ret;
 	}
+	
+	//begin mimarmu1 & fraalpe2
+	public Action dropDownAt(Position position){
+		Assert.notNull(position);
+		
+		return new CompoundAction.Builder().add(new MouseMove(position), 1)
+				.add(LMouseDown, 0).add(LMouseUp, 0).add(NOP, 0.2).add(new KeyDown(KBKeys.VK_RIGHT),0).build();
+	}
+	
+	public Action dropDownAt(double absX, double absY){
+		return dropDownAt(new AbsolutePosition(absX, absY));
+	}
+	
+	public Action dropDownAt(Widget w, double relX, double relY){
+		Finder wf = abstractor.apply(w);
+		Action ret = dropDownAt(new WidgetPosition(wf, Tags.Shape, relX, relY, true));
+		ret.set(Tags.Targets, Util.newArrayList(wf));
+		return ret;
+	}
+	
+	public Action dropDownAt(Widget w){
+		return dropDownAt(w, 0.5, 0.5);
+	}
+	//end by mimarmu1 & fraalpe2	
 
 	public Action dragFromTo(Widget from, Widget to){
 		return dragFromTo(from, 0.5, 0.5, to, 0.5, 0.5);
@@ -168,7 +194,8 @@ public class StdActionCompiler {
 	
 	public Action hitKey(KBKeys key){
 		return new CompoundAction.Builder().add(new KeyDown(key), .0)
-				.add(new KeyUp(KBKeys.VK_ESCAPE), 1).add(NOP, 1.0).build();
+				//.add(new KeyUp(KBKeys.VK_ESCAPE), 1).add(NOP, 1.0).build();
+				.add(new KeyUp(key), 1).add(NOP, 1.0).build(); // by urueda (typo fix?)
 	}
 	
 	public Action killProcessByPID(long pid){ return killProcessByPID(pid, 0); }

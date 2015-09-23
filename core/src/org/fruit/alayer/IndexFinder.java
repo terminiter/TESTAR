@@ -63,4 +63,10 @@ public final class IndexFinder implements Searcher, Finder {
 		apply(start, yf);
 		return yf.result();
 	}
+
+	@Override
+	public Widget getCachedWidget() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

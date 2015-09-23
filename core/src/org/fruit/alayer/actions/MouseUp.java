@@ -31,6 +31,7 @@ import org.fruit.Assert;
 import org.fruit.Util;
 import org.fruit.alayer.ActionFailedException;
 import org.fruit.alayer.Action;
+import org.fruit.alayer.Role;
 import org.fruit.alayer.State;
 import org.fruit.alayer.SUT;
 import org.fruit.alayer.NoSuchTagException;
@@ -61,4 +62,22 @@ public final class MouseUp extends TaggableBase implements Action {
 			throw new ActionFailedException(tue);
 		}
 	}
+	
+	// by urueda
+	@Override
+	public String toShortString() {
+		Role r = get(Tags.Role, null);
+		if (r != null)
+			return r.toString();
+		else
+			return toString();
+	}
+
+	// by urueda
+	@Override
+	public String toParametersString() {
+		//return "(" + btn.toString() + ")";
+		return "";
+	}
+	
 }

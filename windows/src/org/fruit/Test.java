@@ -92,7 +92,7 @@ public final class Test{
 		System.out.println("Tree Size: " + Util.size(s) +  "   information size: " + info.length() + "  information: " );
 		System.out.println(Util.treeDesc(s, 2, Tags.Desc, Tags.Shape, Tags.Role));
 
-		s.set(Tags.Screenshot, AWTCanvas.fromScreenshot(Rect.from(0, 0, 1920, 1080), AWTCanvas.StorageFormat.PNG, 1));
+		//s.set(Tags.Screenshot, AWTCanvas.fromScreenshot(Rect.from(0, 0, 1920, 1080), AWTCanvas.StorageFormat.PNG, 1));
 
 		double tuff1 = Util.time();
 		for(int i = 0; i < 100; i++){
@@ -186,7 +186,7 @@ public final class Test{
 			Widget under = Util.widgetFromPoint(state, cursor.x(), cursor.y(), null);
             //Iterable<Widget> unders = Utils.widgetsFromPoint(state, cursor.x(), cursor.y());
 
-			state.set(Tags.Screenshot, AWTCanvas.fromScreenshot((Rect)state.get(Tags.Shape), AWTCanvas.StorageFormat.BMP, 1.0));
+			//state.set(Tags.Screenshot, AWTCanvas.fromScreenshot((Rect)state.get(Tags.Shape), AWTCanvas.StorageFormat.BMP, 1.0));
 			
 			if(under != null){
 				Shape s = under.get(Tags.Shape, null);
@@ -249,7 +249,7 @@ public final class Test{
 			Taggable t = (Taggable) ois.readObject();
 			state = t.get(Tags.SystemState);
 			cv.begin();
-			state.get(Tags.Screenshot).paint(cv, 0, 0, 300, 300);
+			//state.get(Tags.Screenshot).paint(cv, 0, 0, 300, 300);
 			cv.end();
 			Set<Tag<?>> tags = new HashSet<Tag<?>>();
 			tags.addAll(Tags.tagSet());

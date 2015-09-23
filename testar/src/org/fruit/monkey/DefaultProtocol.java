@@ -30,9 +30,9 @@ package org.fruit.monkey;
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
 import static org.fruit.alayer.Tags.IsRunning;
-import static org.fruit.alayer.Tags.Screenshot;
+import static org.fruit.alayer.Tags.ScreenshotPath;
 import static org.fruit.alayer.Tags.Title;
-import static org.fruit.alayer.windows.UIARoles.UIAEdit;
+/*import static org.fruit.alayer.windows.UIARoles.UIAEdit;
 import static org.fruit.alayer.windows.UIARoles.UIAHeader;
 import static org.fruit.alayer.windows.UIARoles.UIAMenu;
 import static org.fruit.alayer.windows.UIARoles.UIAMenuBar;
@@ -45,7 +45,10 @@ import static org.fruit.alayer.windows.UIARoles.UIATitleBar;
 import static org.fruit.alayer.windows.UIARoles.UIAToolBar;
 import static org.fruit.alayer.windows.UIARoles.UIAToolTip;
 import static org.fruit.alayer.windows.UIARoles.UIATree;
-import static org.fruit.alayer.windows.UIARoles.UIAWindow;
+import static org.fruit.alayer.windows.UIARoles.UIAWindow;*/
+import static org.fruit.alayer.windows.UIARoles.*;
+import static org.fruit.alayer.windows.UIATags.*;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -54,6 +57,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+
 import org.fruit.Assert;
 import org.fruit.Pair;
 import org.fruit.Util;
@@ -69,6 +73,7 @@ import org.fruit.alayer.Shape;
 import org.fruit.alayer.State;
 import org.fruit.alayer.SUT;
 import org.fruit.alayer.Rect;
+import org.fruit.alayer.StateBuilder;
 import org.fruit.alayer.Visualizer;
 import org.fruit.alayer.Widget;
 import org.fruit.alayer.Roles;
@@ -89,8 +94,7 @@ import org.fruit.alayer.windows.WinProcess;
 
 public class DefaultProtocol extends AbstractProtocol{
 
-	private UIAStateBuilder builder;
-	final private Random rnd = new Random(500);
+	private StateBuilder builder;
 	private boolean faultySequence;
 
 	private final static Pen RedPen = Pen.newPen().setColor(Color.Red).
@@ -125,11 +129,12 @@ public class DefaultProtocol extends AbstractProtocol{
 	}
 
 	protected State getState(SUT system) throws StateBuildException{
+		Assert.notNull(system); // by urueda
 		State state = builder.apply(system);
 		Shape viewPort = state.get(Tags.Shape, null);
 		if(viewPort != null){
-			AWTCanvas scrShot = AWTCanvas.fromScreenshot(Rect.from(viewPort.x(), viewPort.y(), viewPort.width(), viewPort.height()), AWTCanvas.StorageFormat.PNG, 1);
-			state.set(Screenshot, scrShot);
+			//AWTCanvas scrShot = AWTCanvas.fromScreenshot(Rect.from(viewPort.x(), viewPort.y(), viewPort.width(), viewPort.height()), AWTCanvas.StorageFormat.PNG, 1);
+			state.set(Tags.ScreenshotPath, this.getStateshot(state)); // by urueda
 		}
 		Verdict verdict = getVerdict(state);
 		state.set(Tags.OracleVerdict, verdict);
@@ -222,20 +227,36 @@ public class DefaultProtocol extends AbstractProtocol{
 		return actions;
 	}
 
-	protected Action selectAction(State state, Set<Action> actions){ 
-		Assert.isTrue(actions != null && !actions.isEmpty());
-		return new ArrayList<Action>(actions).get(rnd.nextInt(actions.size()));
-	}
-
 	protected boolean moreActions(State state) {
 		return (!settings().get(ConfigTags.StopGenerationOnFault) || !faultySequence) && 
 				state.get(Tags.IsRunning, false) && !state.get(Tags.NotResponding, false) &&
-				actionCount() < settings().get(ConfigTags.SequenceLength) &&
+				//actionCount() < settings().get(ConfigTags.SequenceLength) &&
+				actionCount() <= settings().get(ConfigTags.SequenceLength) && // by urueda
 				timeElapsed() < settings().get(ConfigTags.MaxTime);
 	}
 
 	protected boolean moreSequences() {	
-		return sequenceCount() < settings().get(ConfigTags.Sequences) &&
+		//return sequenceCount() < settings().get(ConfigTags.Sequences) &&
+		return sequenceCount() <= settings().get(ConfigTags.Sequences) && // by urueda		
 				timeElapsed() < settings().get(ConfigTags.MaxTime);
 	}
+	
+    // begin by urueda
+    private final int MAX_TEXT_LENGTH = 64;
+    private final int LETTER_COUNT = 'z' - 'a' + 1;
+    // end by urueda
+    
+    // by urueda (utility method for random text inputs)
+    protected String getRandomText(){
+    	Random rd = new Random(System.currentTimeMillis());
+    	int textLength = rd.nextInt(MAX_TEXT_LENGTH);
+    	StringBuffer sb = new StringBuffer(textLength);
+    	for (int i=0; i<textLength; i++){
+    		sb.append((char)('a' + rd.nextInt(LETTER_COUNT)));    				
+    	}
+    	if (sb.length() == 0)
+    		sb.append("Text input 123");
+    	return sb.toString();
+    }
+	
 }

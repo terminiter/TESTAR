@@ -41,24 +41,21 @@ import org.fruit.alayer.devices.KBKeys;
 /**
  * An action which presses a given Key on the Keyboard.
  */
-public final class KeyDown extends TaggableBase implements Action {
+public final class KeyDown extends //TaggableBase 
+		KeyAction { // by urueda 
+
 	private static final long serialVersionUID = -462251384755779329L;
-	private final KBKeys key;
 		
 	public KeyDown(KBKeys key){
-		Assert.notNull(key);
-		this.key = key;
+		super(key);
 	}
 	
 	public String toString() { return "Press Key " + key; }
 
-	public void run(SUT system, State state, double duration) {
-		try{
-			Assert.notNull(system);
-			Util.pause(duration);
-			system.get(Tags.StandardKeyboard).press(key);
-		}catch(NoSuchTagException tue){
-			throw new ActionFailedException(tue);
-		}
+	// by urueda
+	@Override
+	protected void keyAction(SUT system, KBKeys key) {
+		system.get(Tags.StandardKeyboard).press(key);		
 	}
+	
 }

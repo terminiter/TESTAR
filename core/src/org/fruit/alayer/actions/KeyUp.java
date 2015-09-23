@@ -41,24 +41,25 @@ import org.fruit.alayer.devices.KBKeys;
 /**
  * An action which releases a given Key on the Keyboard.
  */
-public final class KeyUp extends TaggableBase implements Action {	
+public final class KeyUp extends //TaggableBase
+		KeyAction { // by urueda
+	
 	private static final long serialVersionUID = -7035337967443813849L;
-	private final KBKeys key;
 
 	public KeyUp(KBKeys key){
-		Assert.notNull(key);
-		this.key = key;
+		super(key);
 	}
 	
-	public void run(SUT system, State state, double duration) {
-		try{
-			Assert.notNull(system);
-			Util.pause(duration);
-			system.get(Tags.StandardKeyboard).release(key);
-		}catch(NoSuchTagException tue){
-			throw new ActionFailedException(tue);
-		}
+	public String toString() { return "Release Key " + key; }
+
+	// by urueda
+	@Override
+	protected void keyAction(SUT system, KBKeys key) {
+		system.get(Tags.StandardKeyboard).release(key);		
 	}
 
-	public String toString() { return "Release Key " + key; }
+	// by urueda
+	@Override
+	protected void altNumpad(SUT system, String numpadCodes){}
+
 }

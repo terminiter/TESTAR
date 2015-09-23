@@ -32,6 +32,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Map;
 import org.fruit.Util;
+import org.fruit.alayer.Role;
+import org.fruit.alayer.Roles;
+import org.fruit.alayer.Tags;
 
 final class UIARootElement extends UIAElement {
 	private static final long serialVersionUID = -2561441199642411403L;

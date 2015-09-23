@@ -47,7 +47,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
+
 import org.fruit.Assert;
+import org.fruit.alayer.AWTCanvas;
 import org.fruit.alayer.DFNavigator;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.Canvas;
@@ -69,6 +71,7 @@ import org.fruit.alayer.Tags;
 import org.fruit.alayer.WidgetIterator;
 import org.fruit.alayer.WidgetNotFoundException;
 import org.fruit.alayer.devices.Mouse;
+
 import java.lang.System;
 
 /**
@@ -134,12 +137,27 @@ public final class Util {
 		return Point.from(shape.x() + shape.width() * relX, shape.y() + shape.height() * relY);
 	}
 
+	// by urueda
+	public static Point absToRel(Shape shape, double absX, double absY){
+		return Point.from(absToRelX(shape,absX), absToRelY(shape,absY));
+	}
+	
 	public static double relToAbsX(Shape shape, double relX){
 		return shape.x() + shape.width() * relX;
 	}
 
 	public static double relToAbsY(Shape shape, double relY){
 		return shape.y() + shape.height() * relY;
+	}
+
+	// by urueda
+	public static double absToRelX(Shape shape, double absX){
+		return Math.floor(Math.abs(absX - shape.x()) / shape.width());
+	}
+
+	// by urueda
+	public static double absToRelY(Shape shape, double absY){
+		return Math.floor(Math.abs(absY - shape.y()) / shape.height());
 	}
 
 	public static boolean contains(Widget widget, double x, double y){
@@ -225,12 +243,24 @@ public final class Util {
 
 	public static void pause(double seconds){
 		if(seconds <= 0) return;
-
-		try {
-			Thread.sleep(Math.round(seconds * 1000.0));
-		} catch (InterruptedException e) {
-			throw new RuntimeException(e);
-		}		
+		
+		//try {
+		//	Thread.sleep(Math.round(seconds * 1000.0));
+		//} catch (InterruptedException e) {
+		//	throw new RuntimeException(e);
+		//}
+		
+		// begin by urueda
+		long sleepT, waitUntil = System.currentTimeMillis() + Math.round(seconds * 1000.0);
+		do{
+			sleepT = waitUntil - System.currentTimeMillis();
+			if (sleepT > 0){
+				try{
+					Thread.sleep(sleepT);
+				} catch (InterruptedException e){}
+			}
+		} while (sleepT > 0);
+		// end by urueda
 	}
 
 	public static double time(){
@@ -265,7 +295,10 @@ public final class Util {
 	public static String abbreviate(String string, int maxLen, String abbreviation){
 		Assert.notNull(string, abbreviation);
 		Assert.isTrue(maxLen >= 0);
-		return string.substring(0, Math.min(maxLen, string.length())) + (string.length() > maxLen ? abbreviation : "");
+		//return string.substring(0, Math.min(maxLen, string.length())) + (string.length() > maxLen ? abbreviation : "");
+		// by urueda
+		return (string.substring(0, Math.min(maxLen, string.length())) + (string.length() > maxLen ? abbreviation : ""))
+				.replaceAll("\\r\\n|\\n", "_");
 	}
 
 	public static Point OrthogonalPoint(double x1, double y1, double x2, double y2, double r){		
@@ -347,7 +380,8 @@ public final class Util {
 				sb.append(' ');
 
 			for(Tag<?> t : tags)
-				sb.append(w.get(t, null)).append(", ");
+				sb.append(w.get(t, null)).append(", ");					
+
 			sb.append(Util.lineSep());
 		}
 		return sb.toString();
@@ -629,7 +663,8 @@ public final class Util {
 
 	public static File generateUniqueFile(String dir, String prefix){
 		Assert.notNull(dir, prefix);
-		int i = 0;
+		//int i = 0;
+		int i = 1; // by urueda
 		File f;
 		while((f = new File(dir + File.separator + prefix + i)).exists())
 			i++;
@@ -665,4 +700,16 @@ public final class Util {
 	}
 	public static <T> HashSet<T> newHashSet(){ return new HashSet<T>(); }
 	public static <K, V> HashMap<K, V> newHashMap(){ return new HashMap<K, V>(); }
+	
+	// by urueda
+	public static <T> T[] join(T[] first, T[] second) {
+		if (first == null)
+			return second;
+		if (second == null)
+			return first;
+		T[] result = Arrays.copyOf(first, first.length + second.length);
+		System.arraycopy(second, 0, result, first.length, second.length);
+		return result;
+	}
+	
 }

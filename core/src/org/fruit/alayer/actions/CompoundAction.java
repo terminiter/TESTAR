@@ -28,13 +28,17 @@
 package org.fruit.alayer.actions;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+
 import org.fruit.Assert;
 import org.fruit.Util;
 import org.fruit.alayer.Action;
+import org.fruit.alayer.Role;
 import org.fruit.alayer.State;
 import org.fruit.alayer.SUT;
 import org.fruit.alayer.TaggableBase;
+import org.fruit.alayer.Tags;
 
 /**
  * An action that is composed of several other actions.
@@ -96,5 +100,31 @@ public final class CompoundAction extends TaggableBase implements Action {
 		for(Action a : actions)
 			sb.append(Util.lineSep()).append(a.toString());
 		return sb.toString();
+	}
+
+	// by urueda
+	@Override
+	public String toShortString() {
+		StringBuilder sb = new StringBuilder();
+		Role r = get(Tags.Role, null);
+		if (r != null)
+			sb.append(r.toString());
+		else
+			sb.append("UNDEF");
+		HashSet<String> parameters = new HashSet<String>();
+		for (Action a : actions)
+			parameters.add(a.toParametersString());
+		for (String p : parameters)
+			sb.append(p);
+		return sb.toString();
+	}
+
+	// by urueda
+	@Override
+	public String toParametersString() {
+		String params = "";
+		for (Action a : actions)
+			params += a.toParametersString();
+		return params;
 	}
 }

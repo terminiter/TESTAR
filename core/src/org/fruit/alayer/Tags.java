@@ -144,7 +144,8 @@ public final class Tags {
 	public static final Tag<Long> TimeStamp = from("TimeStamp", Long.class);
 	
 	/** Usually attached to an object of {@link State}. The value is a screenshot of the state. */
-	public static final Tag<Image> Screenshot = from("Screenshot", Image.class);
+	//public static final Tag<Image> Screenshot = from("Screenshot", Image.class);
+	public static final Tag<String> ScreenshotPath = from("ScreenshotPath", String.class); // by urueda
 		
 	/** Usually attached to a {@link State} object. The value is an outcome of a test oracle for that state. It is
 	 * used to mark states as 'suspicious' or 'erroneous' */

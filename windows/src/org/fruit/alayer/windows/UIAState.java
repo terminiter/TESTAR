@@ -108,7 +108,7 @@ final class UIAState extends UIAWidget implements State {
 		}else if(w.element == null || w.tags.containsKey(t)){
 			return defaultValue;
 		}
-
+		
 		if(t.equals(Tags.Desc)){
 			ret = w.element.name;
 		}else if(t.equals(Tags.Role)){
@@ -141,6 +141,30 @@ final class UIAState extends UIAWidget implements State {
 			ret = w.element.name;
 		}else if(t.equals(UIATags.UIAOrientation)){
 			ret = w.element.orientation;
+		// begin by urueda
+		}else if(t.equals(UIATags.UIAIsWindowModal)){
+			ret = w.element.isModal;
+		}else if(t.equals(UIATags.UIAScrollPattern)){
+			ret = w.element.scrollPattern;
+		//}else if(t.equals(UIATags.UIAScrollbarInfo)){
+		//	ret = w.element.scrollbarInfo;
+		//}else if(t.equals(UIATags.UIAScrollbarInfoH)){
+		//	ret = w.element.scrollbarInfoH;
+		//}else if(t.equals(UIATags.UIAScrollbarInfoV)){
+		//	ret = w.element.scrollbarInfoV;
+		}else if(t.equals(UIATags.UIAHorizontallyScrollable)){
+			ret = w.element.hScroll;
+		}else if(t.equals(UIATags.UIAVerticallyScrollable)){
+			ret = w.element.vScroll;
+		}else if(t.equals(UIATags.UIAScrollHorizontalViewSize)){
+			ret = w.element.hScrollViewSize;
+		}else if(t.equals(UIATags.UIAScrollVerticalViewSize)){
+			ret = w.element.vScrollViewSize;
+		}else if(t.equals(UIATags.UIAScrollHorizontalPercent)){
+			ret = w.element.hScrollPercent;
+		}else if(t.equals(UIATags.UIAScrollVerticalPercent)){
+			ret = w.element.vScrollPercent;
+		// end by urueda
 		}else if(t.equals(UIATags.UIAHelpText)){
 			ret = w.element.helpText;
 		}else if(t.equals(UIATags.UIAClassName)){
@@ -162,9 +186,9 @@ final class UIAState extends UIAWidget implements State {
 		}else if(t.equals(UIATags.UIAAutomationId)){
 			ret = w.element.automationId;
 		}
-
+		
 		cacheTag(w, t, ret);
-
+		
 		return (ret == null) ? defaultValue : (T)ret;
 	}
 
@@ -238,7 +262,8 @@ final class UIAState extends UIAWidget implements State {
 		return ret;
 	}
 
-	public String toString(){ return Util.treeDesc(this, 2, Tags.Desc); }
+	//public String toString(){ return Util.treeDesc(this, 2, Tags.Desc); }
+	public String toString(){ return Util.treeDesc(this, 2, Tags.Role, Tags.Title); }// by urueda
 
 	private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException{
 		ois.defaultReadObject();

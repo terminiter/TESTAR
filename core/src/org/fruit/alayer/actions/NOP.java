@@ -29,9 +29,11 @@ package org.fruit.alayer.actions;
 
 import org.fruit.Util;
 import org.fruit.alayer.Action;
+import org.fruit.alayer.Role;
 import org.fruit.alayer.State;
 import org.fruit.alayer.SUT;
 import org.fruit.alayer.TaggableBase;
+import org.fruit.alayer.Tags;
 
 /**
  * The 'No Operation' action.
@@ -40,4 +42,21 @@ public class NOP extends TaggableBase implements Action {
 	private static final long serialVersionUID = 8622084462407313716L;
 	public void run(SUT system, State state, double duration){ Util.pause(duration); }
 	public String toString(){ return "No Operation"; }
+	
+	// by urueda
+	@Override
+	public String toShortString() {
+		Role r = get(Tags.Role, null);
+		if (r != null)
+			return r.toString();
+		else
+			return toString();
+	}
+
+	// by urueda
+	@Override
+	public String toParametersString() {
+		return "";
+	}
+	
 }

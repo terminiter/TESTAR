@@ -37,6 +37,7 @@ public final class WidgetPosition implements Position {
 	private final double relX, relY;
 	private final Tag<? extends Shape> shapeTag;
 	private final boolean hitTest;
+	private transient Point cachedWidgetPoint = null; // by urueda
 
 	public static WidgetPosition fromFinder(Finder finder){
 		return fromFinder(finder, 0.5, 0.5);
@@ -50,6 +51,11 @@ public final class WidgetPosition implements Position {
 		Assert.notNull(finder, shapeTag);		
 		this.shapeTag = shapeTag;
 		this.finder = finder;
+		// begin by urueda
+		Widget cachedWidget = finder.getCachedWidget();
+		if (cachedWidget != null)
+			cachedWidgetPoint = Util.relToAbs(cachedWidget.get(shapeTag), relX, relY);
+		// end by urueda
 		this.relX = relX;
 		this.relY = relY;
 		this.hitTest = hitTest;
@@ -60,7 +66,11 @@ public final class WidgetPosition implements Position {
 			Widget widget = finder.apply(state);
 			if(hitTest && !Util.hitTest(widget, relX, relY))
 				throw new PositionException("Widget found, but hittest failed!");
-			return Util.relToAbs(widget.get(shapeTag), relX, relY);
+			//return Util.relToAbs(widget.get(shapeTag), relX, relY);
+			// start by urueda
+			cachedWidgetPoint = Util.relToAbs(widget.get(shapeTag), relX, relY);
+			return cachedWidgetPoint;
+			// end by uureda
 		}catch(WidgetNotFoundException wnfe){
 			throw new PositionException(wnfe);
 		}catch(NoSuchTagException pue){
@@ -68,5 +78,16 @@ public final class WidgetPosition implements Position {
 		}
 	}
 
-	public String toString(){ return "WidgetPosition (" + relX + ", " + relY + ")"; }
+	public String toString(){
+		//return "WidgetPosition (" + relX + ", " + relY + ")";
+		// start by urueda
+		//return "WidgetPosition" +
+		//		((cachedWidgetPoint == null) ? "" : cachedWidgetPoint.toString()) +
+		//		" (" + relX + ", " + relY + ")";
+		if (cachedWidgetPoint == null)
+			return "(" + relX + "," + relY + ")";
+		else
+			return cachedWidgetPoint.toString();
+		// end by urueda
+	}
 }

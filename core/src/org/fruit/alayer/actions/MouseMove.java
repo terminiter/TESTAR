@@ -34,6 +34,7 @@ import org.fruit.alayer.ActionFailedException;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.Point;
 import org.fruit.alayer.Position;
+import org.fruit.alayer.Role;
 import org.fruit.alayer.State;
 import org.fruit.alayer.SUT;
 import org.fruit.alayer.NoSuchTagException;
@@ -78,5 +79,22 @@ public final class MouseMove extends TaggableBase implements Action {
 		}catch(PositionException pe){
 			throw new ActionFailedException(pe);
 		}
+	}
+
+	// by urueda
+	@Override
+	public String toShortString() {
+		Role r = get(Tags.Role, null);
+		if (r != null)
+			return r.toString() + toParametersString();
+		else
+			return toString();
+	}
+
+	// by urueda
+	@Override
+	public String toParametersString() {
+		//return position.toString();
+		return "";
 	}	
 }

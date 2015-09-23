@@ -28,6 +28,7 @@
 package org.fruit.monkey;
 
 import static org.fruit.monkey.ConfigTags.PathToReplaySequence;
+
 import java.awt.Canvas;
 import java.awt.Graphics;
 import java.awt.event.ComponentAdapter;
@@ -38,19 +39,31 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.List;
+import java.util.zip.GZIPInputStream;
+
+import org.fruit.Assert;
 import org.fruit.Util;
 import org.fruit.alayer.AWTCanvas;
+import org.fruit.alayer.AbsolutePosition;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.Color;
+import org.fruit.alayer.EllipseVisualizer;
 import org.fruit.alayer.FillPattern;
+import org.fruit.alayer.Finder;
 import org.fruit.alayer.Image;
 import org.fruit.alayer.Pen;
+import org.fruit.alayer.Point;
+import org.fruit.alayer.Position;
+import org.fruit.alayer.Shape;
+import org.fruit.alayer.ShapeVisualizer;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Taggable;
 import org.fruit.alayer.Rect;
 import org.fruit.alayer.StdState;
 import org.fruit.alayer.Tags;
 import org.fruit.alayer.Visualizer;
+import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.NOP;
 
 
@@ -165,7 +178,8 @@ public class SequenceViewer extends java.awt.Frame {
 	public void nextPic() throws IOException, ClassNotFoundException{
 		if(stream == null){
 			FileInputStream fis = new FileInputStream(new File(settings.get(PathToReplaySequence)));
-			BufferedInputStream bis = new BufferedInputStream(fis);
+			//BufferedInputStream bis = new BufferedInputStream(fis);
+			BufferedInputStream bis = new BufferedInputStream(new GZIPInputStream(fis)); // by urueda
 			stream = new ObjectInputStream(bis);
 		}
 
@@ -179,7 +193,11 @@ public class SequenceViewer extends java.awt.Frame {
 
 		State state = fragment.get(Tags.SystemState, new StdState());
 
-		Image img = state.get(Tags.Screenshot, null);
+		//Image img = state.get(Tags.Screenshot, null);
+		// begin by urueda
+		String scrshotPath = state.get(Tags.ScreenshotPath, null);
+		Image img = AWTCanvas.fromFile(scrshotPath);
+		// end by urueda
 		if(img == null){
 			AWTCanvas awtc = new AWTCanvas(0.0, 0.0, new BufferedImage(1024, 768, BufferedImage.TYPE_INT_ARGB), AWTCanvas.StorageFormat.PNG, 1.0);
 			awtc.begin();
@@ -199,8 +217,34 @@ public class SequenceViewer extends java.awt.Frame {
 		img.paint(cv, Rect.from(0, 0, img.width(), img.height()), Rect.from(0, 0, cv.width(), cv.height()));
 
 		Action a = fragment.get(Tags.ExecutedAction, new NOP());
-		Visualizer v = a.get(Tags.Visualizer, Util.NullVisualizer);
-		v.run(state, cv, Pen.startFrom(Pen.DefaultPen).setColor(Color.Red).setFillPattern(FillPattern.Solid).build());
+		//Visualizer v = a.get(Tags.Visualizer, Util.NullVisualizer);
+		//v.run(state, cv, Pen.startFrom(Pen.DefaultPen).setColor(Color.Red).setFillPattern(FillPattern.Solid).build());
+		// begin by urued
+		if (state.childCount() > 0){
+			Shape sutShape = state.child(0).get(Tags.Shape);
+			List<Finder> targets = a.get(Tags.Targets, null);
+			if (targets != null){
+				Assert.notNull(sutShape);
+				Visualizer v;
+				Widget w;
+				Shape s, vShape;
+				Pen pen = Pen.startFrom(Pen.DefaultPen)
+						.setColor(Color.Red)
+						.setFillPattern(FillPattern.Stroke)
+						.setStrokeWidth(2.0)
+						.build();
+				for (Finder f : targets){
+					w = f.apply(state);
+					s = w.get(Tags.Shape);
+					Assert.notNull(s);
+					vShape = Rect.from(s.x() - sutShape.x(), s.y() - sutShape.y(), // absolute to SUT' relative
+									   s.width(), s.height());
+					v = new ShapeVisualizer(pen, vShape, null, 0.0, 0.0);
+					v.run(state, cv, pen);
+				}
+			}
+		}
+		// end by urueda
 		cv.end();
 		stateCount++;
 		updateInfo(a.get(Tags.Desc, "<no description available>"));
