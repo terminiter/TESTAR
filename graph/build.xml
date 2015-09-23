@@ -1,0 +1,35 @@
+<project name="graph" default="jar">
+    
+    <!-- properties -->
+    <property name="src" location="src/"/>
+    <property name="bin" location="bin/"/>
+	<property name="targetdir" location="target/"/>
+    <property name="jarfile" value="graph.jar"/>
+	<property name="coreJarFile" location="../core/target/core.jar"/>	
+	<property name="graphviz" location="lib/com.alexmerz.graphviz.jar"/>
+	<property name="jgrapht" location="lib/jgrapht-jdk1.6.jar"/>
+	<target name="all" depends="jar"/>
+
+    <!-- targets -->	
+	<target name="dependencies">
+		<depend srcdir="${src}" destdir="${bin}" closure="yes" classpath = "${coreJarFile};${graphviz};${jgrapht}" />
+	</target>	
+	
+    <!-- targets -->
+    <target name="compile" depends="dependencies">
+        <ant antfile="build.xml" dir="../core" target="jar" inheritAll="false"/>	
+        <mkdir dir="${bin}"/>
+        <javac classpath="${coreJarFile};${graphviz};${jgrapht}" sourcepath="" srcdir="${src}" destdir="${bin}" failonerror="true" verbose="no" listfiles="no"
+        	includeantruntime="false" debug="on" debuglevel="lines,vars,source"/>
+    </target>
+
+    <target name="jar" depends="compile">
+        <mkdir dir="${targetdir}"/>
+        <jar basedir="${bin}" destfile="${targetdir}/${jarfile}"/>
+    </target>
+
+    <target name="clean">
+        <delete dir="${bin}"/>
+        <delete dir="${targetdir}"/>
+    </target>
+</project>

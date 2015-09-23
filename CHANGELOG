@@ -1,0 +1,50 @@
+#TESTAR v1.1a (2015-09-22)
+--------------------------
+
+Enhancements:
+	- Widgets hierarchy (Spy mode):
+		-> which are the parents widgets? ... Shortcut: Ctrl
+	- Test sequence graphs:
+		-> Which SUT UI States did a test sequence traversed?
+		-> Which SUT UI Actions were executed?
+		-> .dot/.svg graphs:
+			--> minimal: states/actions repetition number
+			--> tiny: states/actions identificators (+ minimal info)
+			--> screenshoted (+ tiny info)
+		-> Test sequence reporting (including #states, #actions, verdict)
+	- Test sequence generators:
+		-> Q-Learning (more clever action selection than Random)
+	- GenerateManual mode (Shortcut: Shift + Left/Right arrow from Spy/Generate modes):
+		-> Blended testing: let TESTAR do it automatically or take the control at any time!
+		
+Improvements
+	- Widgets recognition ("Internet Explorer" browser):
+		-> scrollbars
+		-> modal windows
+	- Widgets filtering helper (by Title):
+		-> ClickFilterLayerProtocol enables to (under Spy mode):
+			--> add widget title to a filter list (displayed at console) ... Shortcut: Shift + Left click
+			--> remove widget title from a filter list (displayed at console) ... Shortcut: Shift + Right click
+	- Performance:
+		-> Disk space
+			-> GZIP streams for test sequence serialisation
+			-> Test sequence UI screenshots moved from the serialisation to a shared repository for TESTAR and Graphs (.png format)
+			
+Fixes
+	- Widgets properties (Spy mode ... Shortcut: Shift + 3):
+		-> Properties window displayed inside Screen (sometimes it was outside)
+		-> Parent Roles property displayed multi-line (single line truncated roles)
+	- Test sequence logs:
+		-> Detailed action execution (widgets without Title made hard to manually reproduce a sequence from the log)
+	- Manual testing:
+		-> User events (Left/Right clicks and typing) are captured by TESTAR (user events were lost in the test sequence, hence non replayable)
+	- Minor bugs fixes
+
+Experimental:
+	- AdhocTest mode (Shortcut: Shift + Enter from Spy/Generate modes):
+		-> activates a server to listen to test sequences (port 47357)
+			--> format (one action per line): <action_type(parameters*)>\r\n (i.e. LC(100.0,50,5))
+		
+
+
+
