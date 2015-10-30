@@ -62,7 +62,7 @@ public class GraphReporter {
 		IGraphState verdictVertex = null;
 		int unxC;
 		for(IGraphState vertex : g.vertexSet()){
-			if (vertex.toString().equals("PASS") || vertex.equals("FAIL"))
+			if (vertex.toString().equals("PASS") || vertex.toString().equals("FAIL"))
 				verdictVertex = vertex;
 			else{
 				String nodeLabel = vertex.toString() + " (" + vertex.getCount() + ")";
