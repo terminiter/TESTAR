@@ -11,9 +11,13 @@
 		=> Mozilla Firefox: scrollbars not being detected (not compliant with Accessiblity API)
 		=> Google Chrome: web application widgets not being detected
 
-- Protocol compilation
-	-> "JDK required (running inside of JRE) error" error message
-		=> make sure you are running TESTAR with Java JDK version (not JRE version)
+- Protocol
+	-> Editing
+		-> "ReferenceError: "ImportPackage" is not defined in <eval> at line number 2" error message
+			=> Just ignore the message (due to outdated library jsyntaxpane-0.9.5-b29)
+	-> Compilation
+		-> "JDK required (running inside of JRE) error" error message
+			=> make sure you are running TESTAR with Java JDK version (not JRE version)
 		
 - Console error messages
 	-> "System is offline! I assume it crashed"
