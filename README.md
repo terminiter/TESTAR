@@ -16,6 +16,13 @@ Test your system from the GUI:
 
 ## Releases
 
+**TESTAR v1.2**: upcoming
+* Test protocol filtering addon
+* SUT UI exploration curve
+* Abstracted minimal graphs, and more:
+http://webtestar.dsic.upv.es/upcoming/abstract_minimal_graph.svg
+* ...
+
 **TESTAR v1.1a**: https://github.com/STaQ-PROS-UPV/TESTAR/releases/tag/v1.1a
 Requirements:
 * Java JDK/JRE 1.8 x64 (protocol compilation will require JDK)
