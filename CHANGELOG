@@ -1,3 +1,69 @@
+#TESTAR v1.2 (2016-02-04)
+-------------------------
+
+Enhancements:
+	- Sequence viewer:
+		-> Begin, Previous and End buttons added
+	- Testing protocol:
+		-> SUT monitoring: engage based on specific title on titlebar
+			--> How?: startSystem("My SUT must contain this title")
+			--> When?: for SUTs that are started through other applications (i.e. jnlp for Java applications)
+		-> Experimental: Actions priorisation to enable forms filling (text-input fields and slides)
+			(i.e. new database user creation: name/surname, phone, direction, etc.)
+		-> Protocol helpers through direct GUI manipulation (no programming) based on lists of widgets (identified by IDs) matched to:
+			--> Actions filtering (white and tabu lists)
+				---> Shift + Ctrl => switch widget under cursor to White list
+				---> Ctrl => switch widget under cursor to Black/Tabu list
+			--> Text-fields - valid input values
+				---> Date fields: Shift + Ctrl + D => switch between date values and regular texts
+			--> Requirements: ClickFilterLayerProtocol and Spy mode; recommended: Shift+2 deactivated, Shift+1 activated
+			--> Toggle CAPS_LOCK for viewing widgets matching status
+			--> General rule at protocol is applied whenever widgets are not present in any list
+			--> Matching is saved to "ProtocolFilter.idx"
+	- Widgets hierarchy (Spy mode):
+		-> which are the parents widgets? ... Shortcut replaced from: Ctrl ... to: Alt		
+	- Reporting
+		-> Exploration curve with the number of unique/abstract states/actions (sampled every 100 executed actions)
+		
+Improvements:
+	- graphs: actions ORDER (i.e. [1][5][21]...) broken in lines for readability due to long orders
+	- CodingManager now accepts parameters for:
+		-> Coding States: which widget properties to take into account?
+			(i.e. Title and Shape could be good for debug, but might expand graphs too much even to oo)
+		-> Coding Actions: which action types should discard parameters?
+			(i.e. typing could produce oo different actions)
+	- States and Actions clustering:
+		-> Abstraction due to <Title,Shape> for States and <MouseMove,Type> parameters discarding for Actions
+		-> Clusters of related States and Actions (equal abstractions)
+		-> Clusters are reported:
+			@console/logs
+			@graphs: abstract version for minimal, tiny and screenshoted .dot/.svg
+	- Verdicts
+		-> WARNING verdict (oracle found something?) in addition to OK/PASS and FAIL
+		-> WARNING oracles behave like an OK/PASS, but they are marked @graphs (yellow); abstract graphs do not mark this feature
+	- test.settings (Q-Learning)
+		-> TestGenerator = random | qlearning
+		-> MaxReward = 1 .. 9999999
+		-> Discount = 0.001 .. 1.0
+		
+Refactoring
+	- testar->windows package independence
+		-> middle package native providing a native connector
+
+Fixes
+	- GenerateManual
+		-> wait time between actions was missing (impact: widget-trees might have been retrieved incomplete)
+	- TESTAR logs
+		-> Keep saving along test sequences (waiting for end of tests might return empty log due to unexpected errors)
+	- Graphs
+		-> Keep graph connected when the same action moves to different states
+	- Test sequence screenshots
+		-> dump may throw exception if SUT is suddenly closed (i.e. SUT close, SUT crash, etc.)
+	- Running TESTAR (testar.bat)
+		-> java executable at a path with blank spaces (i.e. Program Files)
+		-> print Java version requirement & detected version (feedback for unsupported java versions)
+	- Minor bug fixes
+
 #TESTAR v1.1a (2015-09-22)
 --------------------------
 
@@ -44,7 +110,7 @@ Experimental:
 	- AdhocTest mode (Shortcut: Shift + Enter from Spy/Generate modes):
 		-> activates a server to listen to test sequences (port 47357)
 			--> format (one action per line): <action_type(parameters*)>\r\n (i.e. LC(100.0,50,5))
-		
 
+--
 
-
+Note: date format is YYYY-MM-DD
