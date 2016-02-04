@@ -16,7 +16,7 @@ Test your system from the GUI:
 
 ## Releases
 
-**TESTAR v1.2**: upcoming
+**TESTAR v1.2**: https://github.com/STaQ-PROS-UPV/TESTAR/releases/tag/1.2
 * Test protocol filtering addon
 * SUT UI exploration curve
 * Abstracted minimal graphs, and more:
