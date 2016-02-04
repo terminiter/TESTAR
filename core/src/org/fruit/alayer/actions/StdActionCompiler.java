@@ -174,6 +174,13 @@ public class StdActionCompiler {
 				.add(LMouseDown, 0).add(new MouseMove(to), 1)
 				.add(LMouseUp, 0).build();		
 	}
+	
+	// by urueda
+	public Action slideFromTo(Position from, Position to){
+		Action action = dragFromTo(from,to);
+		action.set(Tags.Slider, new Position[]{from,to});
+		return action;
+	}
 
 	public Action clickTypeInto(final Position position, final String text){
 		Assert.notNull(position, text);

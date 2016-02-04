@@ -80,6 +80,12 @@ public class KillProcess extends TaggableBase implements Action {
 	
 	// by urueda
 	@Override
+	public String toString(Role... discardParameters) {
+		return toString();
+	}
+	
+	// by urueda
+	@Override
 	public String toShortString() {
 		Role r = get(Tags.Role, null);
 		if (r != null)

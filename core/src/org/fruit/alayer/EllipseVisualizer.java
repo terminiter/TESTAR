@@ -47,7 +47,9 @@ public final class EllipseVisualizer implements Visualizer {
 	public void run(State state, Canvas canvas, Pen pen) {
 		Assert.notNull(state, canvas, pen);
 		pen = Pen.merge(pen, this.pen);
-		Point p = position.apply(state);
-		canvas.ellipse(pen, p.x() - width * .5, p.y() - height * .5, width, height);
+		try { // by urueda
+			Point p = position.apply(state);
+			canvas.ellipse(pen, p.x() - width * .5, p.y() - height * .5, width, height);
+		} catch (PositionException pe) {}
 	}
 }

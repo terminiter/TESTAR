@@ -17,6 +17,8 @@
 
 package es.upv.staq.testar.graph;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 
 import org.fruit.alayer.Action;
@@ -137,6 +139,18 @@ public interface IEnvironment {
 	public IGraphAction[] getSortedActionsByOrder(int fromOrder, int toOrder);
 	
 	/**
+	 * Retrieves graph states grouped by clusters.
+	 * @return Clusters of related UI states.
+	 */
+	public HashMap<String,Set<String>> getGraphStateClusters();
+
+	/**
+	 * Retrieves graph actions grouped by clusters.
+	 * @return Clusters of related UI actions.
+	 */
+	public HashMap<String,Set<String>> getGraphActionClusters();
+	
+	/**
 	 * Finish the graph environment with ending test sequence. 
 	 * @param walkStatus Test verdict: 'true' test OK, 'false' test FAIL.
 	 * @param lastState Last grah state.
@@ -144,5 +158,11 @@ public interface IEnvironment {
 	 * @param walkEndState SUT state after executing last action from the last state.
 	 */
 	public void finishGraph(boolean walkStatus, IGraphState lastState, IGraphAction lastAction, State walkEndState);
+	
+	/**
+	 * Retrieves data for the exploration curve.
+	 * @return [0] unique_states, [1] unique_actions, [2] abstract_states, [3] abstract_actions
+  	 */
+	public List<int[]> getExplorationCurve();
 	
 }

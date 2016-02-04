@@ -71,5 +71,10 @@ public class StdWidget extends TaggableBase implements Widget, Serializable {
 	public String getRepresentation(String tab){
 		return tab + "???";
 	}
+
+	@Override
+	public String toString(Tag<?>... tags) {
+		return "???";
+	}
 	
 }

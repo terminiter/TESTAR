@@ -48,7 +48,7 @@ public final class ShapeVisualizer implements Visualizer {
 	public void run(State state, Canvas c, Pen pen) {
 		Assert.notNull(state, c, pen);
 		pen = Pen.merge(pen, this.pen);
-		shape.paint(c, pen);		
+		shape.paint(c, pen);
 		if(label != null)
 			c.text(pen, shape.x() + shape.width() * labelX, shape.y() + shape.height() * labelY, 0, label);
 	}

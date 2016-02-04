@@ -32,3 +32,5 @@ SequenceLength = 100
 VisualizeSelectedAction = true
 PathToReplaySequence = ./output/error_sequences
 TestGenerator = random
+MaxReward = 9999999
+Discount = .95

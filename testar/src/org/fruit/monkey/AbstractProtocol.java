@@ -27,7 +27,17 @@
  */
 package org.fruit.monkey;
 
-import static org.fruit.alayer.Tags.*;
+import static org.fruit.alayer.Tags.ActionDelay;
+import static org.fruit.alayer.Tags.ActionDuration;
+import static org.fruit.alayer.Tags.ActionSet;
+import static org.fruit.alayer.Tags.Desc;
+import static org.fruit.alayer.Tags.ExecutedAction;
+import static org.fruit.alayer.Tags.OracleVerdict;
+import static org.fruit.alayer.Tags.Role;
+import static org.fruit.alayer.Tags.SystemState;
+import static org.fruit.alayer.Tags.Visualizer;
+import static org.fruit.monkey.Main.log;
+import static org.fruit.monkey.Main.logln;
 
 import java.awt.Rectangle;
 import java.io.BufferedInputStream;
@@ -47,12 +57,13 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Random;
 import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
@@ -62,37 +73,37 @@ import org.fruit.Assert;
 import org.fruit.UnProc;
 import org.fruit.Util;
 import org.fruit.alayer.AWTCanvas;
+import org.fruit.alayer.Action;
 import org.fruit.alayer.ActionBuildException;
 import org.fruit.alayer.ActionFailedException;
+import org.fruit.alayer.Canvas;
 import org.fruit.alayer.Color;
 import org.fruit.alayer.FillPattern;
-import org.fruit.alayer.Action;
-import org.fruit.alayer.Canvas;
 import org.fruit.alayer.Finder;
 import org.fruit.alayer.Pen;
 import org.fruit.alayer.Point;
 import org.fruit.alayer.Rect;
 import org.fruit.alayer.Role;
+import org.fruit.alayer.Roles;
+import org.fruit.alayer.SUT;
 import org.fruit.alayer.Shape;
 import org.fruit.alayer.State;
-import org.fruit.alayer.SUT;
+import org.fruit.alayer.StateBuildException;
+import org.fruit.alayer.SystemStartException;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.Taggable;
 import org.fruit.alayer.TaggableBase;
-import org.fruit.alayer.Visualizer;
-import org.fruit.alayer.Widget;
-import org.fruit.alayer.Roles;
-import org.fruit.alayer.StateBuildException;
-import org.fruit.alayer.SystemStartException;
 import org.fruit.alayer.Tags;
 import org.fruit.alayer.Verdict;
+import org.fruit.alayer.Visualizer;
+import org.fruit.alayer.Widget;
 import org.fruit.alayer.WidgetNotFoundException;
+import org.fruit.alayer.actions.ActionRoles;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
-import org.fruit.alayer.actions.BriefActionRolesMap;
 import org.fruit.alayer.actions.NOP;
 import org.fruit.alayer.devices.AWTMouse;
-import org.fruit.alayer.devices.Mouse;
 import org.fruit.alayer.devices.KBKeys;
+import org.fruit.alayer.devices.Mouse;
 import org.fruit.alayer.devices.MouseButtons;
 import org.fruit.monkey.Main.LogLevel;
 import org.jnativehook.GlobalScreen;
@@ -102,12 +113,10 @@ import org.jnativehook.keyboard.NativeKeyListener;
 import org.jnativehook.mouse.NativeMouseEvent;
 import org.jnativehook.mouse.NativeMouseListener;
 
-import es.upv.staq.testar.CodingManager; 
+import es.upv.staq.testar.CodingManager;
+import es.upv.staq.testar.ProtocolUtil;
 import es.upv.staq.testar.ScreenshotManager;
 import es.upv.staq.testar.graph.Grapher;
-
-import static org.fruit.monkey.Main.logln;
-import static org.fruit.monkey.Main.log;
 
 public abstract class AbstractProtocol implements NativeKeyListener, NativeMouseListener, UnProc<Settings> {
 	
@@ -224,12 +233,12 @@ public abstract class AbstractProtocol implements NativeKeyListener, NativeMouse
 		
 		// end by urueda
 		
-		markParentWidget = pressed.contains(KBKeys.VK_CONTROL);	// by urueda
+		markParentWidget = pressed.contains(KBKeys.VK_ALT);	// by urueda
 	}
 
 	protected void keyUp(KBKeys key){
 		pressed.remove(key);
-		markParentWidget = pressed.contains(KBKeys.VK_CONTROL);	// by urueda
+		markParentWidget = pressed.contains(KBKeys.VK_ALT);	// by urueda
 	}
 	
 	protected void mouseDown(MouseButtons btn, double x, double y){}
@@ -244,7 +253,7 @@ public abstract class AbstractProtocol implements NativeKeyListener, NativeMouse
 	       		new Double(y)
 			};
 		}
-		// end by urueda		
+		// end by urueda				
 	}
 
 	public final void nativeKeyPressed(NativeKeyEvent e) {
@@ -283,7 +292,6 @@ public abstract class AbstractProtocol implements NativeKeyListener, NativeMouse
 	public synchronized Modes mode(){ return mode; }
 
 	private synchronized void nextMode(boolean forward){
-
 		if(forward){
 			switch(mode){
 			//case Spy: mode = Modes.Generate; break;
@@ -309,7 +317,13 @@ public abstract class AbstractProtocol implements NativeKeyListener, NativeMouse
 			default: break;
 			}			
 		}
-		logln("'" + mode + "' mode active.", LogLevel.Info);
+		//logln("'" + mode + "' mode active.", LogLevel.Info);
+		// begin by urueda
+		String modeParamS = "";
+		if (mode == Modes.GenerateManual)
+			modeParamS = " (" + settings.get(ConfigTags.TimeToWaitAfterAction) + " wait time between actions)";
+		logln("'" + mode + "' mode active." + modeParamS, LogLevel.Info);
+		// end by urueda
 	}
 
 	protected final double timeElapsed(){ return Util.time() - startTime; }
@@ -318,6 +332,7 @@ public abstract class AbstractProtocol implements NativeKeyListener, NativeMouse
 	protected void finishSequence(File recordedSequence) {}
 	protected abstract SUT startSystem() throws SystemStartException;
 	protected abstract State getState(SUT system) throws StateBuildException;
+	protected abstract Verdict getVerdict(State state); // by urueda
 	protected abstract Set<Action> deriveActions(SUT system, State state) throws ActionBuildException;
 	protected abstract Canvas buildCanvas();
 	protected abstract boolean moreActions(State state);
@@ -504,7 +519,7 @@ public abstract class AbstractProtocol implements NativeKeyListener, NativeMouse
 		return repositionShape(canvas,s);
 	}	
 
-	private void visualizeActions(Canvas canvas, State state, Set<Action> actions){
+	protected void visualizeActions(Canvas canvas, State state, Set<Action> actions){
 		if((mode() == Modes.Spy || mode() == Modes.GenerateDebug) && settings().get(ConfigTags.VisualizeActions)){
 			for(Action a : actions)
 				a.get(Visualizer, Util.NullVisualizer).run(state, canvas, Pen.IgnorePen);
@@ -530,12 +545,46 @@ public abstract class AbstractProtocol implements NativeKeyListener, NativeMouse
 			}
 		}
 	}
+
+	// begin by urueda
 	
-	// by urueda
+    // random text inputs	
+    protected String getRandomText(int widgetFormat){
+    	return ProtocolUtil.getRandomText(widgetFormat);
+    }
+	
+    // filter actions that do type
+    protected Set<Action> getTypingActions(Set<Action> actions){
+    	return ProtocolUtil.getTypingActions(actions);
+    }
+    
+    // get the target widgets of typing actions
+    protected HashMap<Widget,Action> getTypeableWidgets(State state, Set<Action> actions){
+    	return ProtocolUtil.getTypeableWidgets(state,actions);
+    }
+    
+    // prioritize typing actions for text inputs dependent behaviors
+    private Set<Action> filterFormActions(State state, Set<Action> actions){
+    	return ProtocolUtil.filterFormActions(state, actions);
+    }
+    
+    // update typing actions management
+    private void updateFormActions(State state, Action selectedAction){
+    	ProtocolUtil.updateFormActions(state,selectedAction);
+    }
+    
+	private final static boolean FORMS_TYPING_ENHANCEMENT = true;
+
 	protected Action selectAction(State state, Set<Action> actions){
-		Assert.isTrue(actions != null && !actions.isEmpty());
-		return Grapher.selectAction(state, actions);
+		Assert.isTrue(actions != null && !actions.isEmpty());		
+		Action selectedAction = Grapher.selectAction(state,
+				FORMS_TYPING_ENHANCEMENT ? filterFormActions(state,actions) : actions);
+		if (FORMS_TYPING_ENHANCEMENT)
+			updateFormActions(state,selectedAction);
+		return selectedAction;
 	}
+	
+	// end by urueda
 
 	protected boolean executeAction(SUT system, State state, Action action){
 		try{
@@ -757,6 +806,7 @@ public abstract class AbstractProtocol implements NativeKeyListener, NativeMouse
 			
 					if(mode() == Modes.Quit) return problems;
 					logln("Selecting action...", LogLevel.Debug);
+					if(mode() == Modes.Spy) return false; // by urueda
 					action = selectAction(state, actions);
 	
 					userEventAction = false; // by urueda
@@ -781,6 +831,8 @@ public abstract class AbstractProtocol implements NativeKeyListener, NativeMouse
 				if (userEventAction || (actionSucceeded = executeAction(system, state, action))){ // by urueda							
 					//logln(String.format("Executed (%d): %s...", actionCount, action.get(Desc, action.toString())), LogLevel.Info);
 					// begin by urueda
+					if (userEventAction)
+						Util.pause(settings.get(ConfigTags.TimeToWaitAfterAction)); // wait between actions
 					logln(String.format("Executed [%d]: %s\n%s",
 							actionCount,
 							"ACTION_" + CodingManager.codify(action) + " " +
@@ -846,7 +898,10 @@ public abstract class AbstractProtocol implements NativeKeyListener, NativeMouse
 				String generatedSequence = Util.generateUniqueFile(settings.get(ConfigTags.OutputDir) + File.separator + "sequences", "sequence").getName(); // by urueda
 
 				// begin by urueda
-				Grapher.grapher(generatedSequence,settings.get(ConfigTags.TestGenerator));
+				Grapher.grapher(generatedSequence,
+								settings.get(ConfigTags.TestGenerator),
+								settings.get(ConfigTags.MaxReward),
+								settings.get(ConfigTags.Discount));
 				scrshotManager = new ScreenshotManager(System.currentTimeMillis(),generatedSequence);
 				scrshotManager.start();
 				// end by urueda
@@ -883,13 +938,16 @@ public abstract class AbstractProtocol implements NativeKeyListener, NativeMouse
 				State state = getState(system);
 				logln("Successfully obtained system state!", LogLevel.Debug);
 				saveStateSnapshot(state);
-				Verdict verdict = state.get(OracleVerdict, Verdict.OK); 
-				if(verdict.severity() >= settings().get(ConfigTags.FaultThreshold)){
-					problems = true;					
-					logln("Detected fault: " + verdict, LogLevel.Critical);
-				}
+
 				Taggable fragment = new TaggableBase();
 				fragment.set(SystemState, state);
+				
+				Verdict verdict = state.get(OracleVerdict, Verdict.OK); 
+				if(verdict.severity() >= settings().get(ConfigTags.FaultThreshold)){
+					problems = true;
+					logln("Detected fault: " + verdict, LogLevel.Critical);
+					fragment.set(OracleVerdict, verdict); // by urueda					
+				}
 	
 				while(mode() != Modes.Quit && moreActions(state)){
 					problems = runAction(cv,system,state,fragment,problems,oos);
@@ -902,6 +960,7 @@ public abstract class AbstractProtocol implements NativeKeyListener, NativeMouse
 						if(verdict.severity() >= settings().get(ConfigTags.FaultThreshold)){							
 							problems = true;
 							logln("Detected fault: " + verdict, LogLevel.Critical);
+							fragment.set(OracleVerdict, verdict); // by urueda
 						}
 						
 						fragment = new TaggableBase();
@@ -950,9 +1009,14 @@ public abstract class AbstractProtocol implements NativeKeyListener, NativeMouse
 				logln("Shutting down the SUT...", LogLevel.Info); // by urueda
 				system.stop();
 				//logln("System has been shut down!", LogLevel.Debug);
-				logln("... SUT has been shut down!", LogLevel.Debug); // by urueda
+				// begin by urueda
+				logln("... SUT has been shut down!", LogLevel.Debug);
 				
-				logln(Grapher.getReport(), LogLevel.Info); // by urueda
+				logln(Grapher.getReport(), LogLevel.Info);
+				try {
+					scrshotManager.join(1000);
+				} catch (InterruptedException e) {}
+				// end by urueda
 				
 				sequenceCount++;
 			}

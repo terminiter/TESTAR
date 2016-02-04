@@ -53,6 +53,16 @@ public final class MouseDown extends TaggableBase implements Action {
 	
 	public String toString() { return "Press Mouse Button " + btn; }
 
+	// by urueda
+	@Override
+	public String toString(Role... discardParameters) {
+		for (Role r : discardParameters){
+			if (r.name().equals(ActionRoles.MouseDown.name()))
+				return "Mouse button pressed";
+		}
+		return toString();
+	}
+
 	public void run(SUT system, State state, double duration){
 		try{
 			Assert.notNull(system);

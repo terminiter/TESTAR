@@ -47,8 +47,10 @@ public final class TextVisualizer implements Visualizer {
 	public void run(State state, Canvas cv, Pen pen) {
 		Assert.notNull(state, cv, pen);
 		pen = Pen.merge(pen, this.pen);
-		Point p = pos.apply(state);
-		Pair<Double, Double> m = cv.textMetrics(pen, text);
-		cv.text(pen, p.x() - m.left() / 2, p.y() - m.right() / 2, 0, text);
+		try { // by urueda
+			Point p = pos.apply(state);
+			Pair<Double, Double> m = cv.textMetrics(pen, text);
+			cv.text(pen, p.x() - m.left() / 2, p.y() - m.right() / 2, 0, text);
+		} catch (PositionException pe) {}			
 	}
 }

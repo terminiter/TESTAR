@@ -101,6 +101,16 @@ public final class CompoundAction extends TaggableBase implements Action {
 			sb.append(Util.lineSep()).append(a.toString());
 		return sb.toString();
 	}
+	
+	// by urueda
+	@Override
+	public String toString(Role... discardParameters) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("Compound Action =");
+		for(Action a : actions)
+			sb.append(Util.lineSep()).append(a.toString(discardParameters));
+		return sb.toString();
+	}	
 
 	// by urueda
 	@Override

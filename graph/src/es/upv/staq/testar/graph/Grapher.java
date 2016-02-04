@@ -24,11 +24,13 @@ import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 
 import es.upv.staq.testar.graph.algorithms.IWalker;
+import es.upv.staq.testar.graph.algorithms.MaxCoverage;
 import es.upv.staq.testar.graph.algorithms.QLearning;
 import es.upv.staq.testar.graph.algorithms.RandomWalker;
 import es.upv.staq.testar.graph.reporting.GraphReporter;
@@ -42,6 +44,7 @@ public class Grapher implements Runnable {
 
 	public static final String RANDOM_GENERATOR = "random"; // default
 	public static final String QLEARNING_GENERATOR = "qlearning";
+	public static final String MAXCOVERAGE_GENERATOR = "maxcoverage";
 		
 	// QLEARNING parameters needs calibration
 	// DISCOUNT history on wincalc (999 actions sequence):
@@ -61,6 +64,9 @@ public class Grapher implements Runnable {
 		// b) => minor states repetition
 		// c) => worse than random
 		// d) => worse than random, high repetition of states
+	private static double MAX_MAXREWARD = 99.9; // higher values to be analysed
+	
+	public static final boolean QLEARNING_CALIBRATION = false; // how-to retrieve from logs: findstr "CALIBRATION" log_file_name.log
 	
 	public static String testGenerator = RANDOM_GENERATOR;
 
@@ -76,13 +82,16 @@ public class Grapher implements Runnable {
 	private static IWalker walker = null;
 	private static WalkStopper walkStopper = null;
 	
+	private static boolean graphing = false; // true while graphing, false otherwise
+	
 	private static transient ExecutorService exeSrv;
 	
 	/**
 	 * Run a new TESTAR grapher.
 	 * @param testGenerator A valid generator is expected.
 	 */
-	public static void grapher(String testSequencePath, String testGenerator) {
+	public static void grapher(String testSequencePath,
+							   String testGenerator, String maxReward, String discount) {
 		try {
 			synchronized(env){
 				while (env != null){ // wait until a previous test sequence grapher finishes ...
@@ -96,6 +105,8 @@ public class Grapher implements Runnable {
 		} catch (Exception e){} // env may be set to null when we try to sync on it
 		Grapher.testSequencePath = testSequencePath;
 		Grapher.testGenerator = testGenerator;
+		Grapher.QLEARNING_MAXREWARD_PARAM = new Double(maxReward).doubleValue();
+		Grapher.QLEARNING_DISCOUNT_PARAM = new Double(discount).doubleValue();
 		exeSrv = Executors.newFixedThreadPool(1);
 		exeSrv.execute(singletonGrapher);
 	}
@@ -122,7 +133,7 @@ public class Grapher implements Runnable {
 		graphAction.setStateshot(actionshotPath);
 		synchronized(movementsFIFO){
 			movementsFIFO.add(new Movement(graphState,graphAction)); // Movements PRODUCER
-			movementsFIFO.notify(); // awake CONSUMER
+			movementsFIFO.notifyAll(); // awake CONSUMER
 		}
 	}	
 	
@@ -137,10 +148,11 @@ public class Grapher implements Runnable {
 			if (endState != null)
 				env.convertState(endState).setStateshot(scrshotPath);
 			walkStopper.stopWalk(status,endState);
+			graphing = false;
 			synchronized(movementsFIFO){
-				movementsFIFO.notify(); // awake CONSUMER
+				movementsFIFO.notifyAll(); // awake CONSUMER
 			}
-		}				
+		}	
 	}
 	
 	/**
@@ -148,11 +160,12 @@ public class Grapher implements Runnable {
 	 * @return Next non consumed movement.
 	 */
 	public static Movement getMovement(){
+		graphing = false;
 		Movement movement = null;
 		synchronized(movementsFIFO){
 			while(movementsFIFO.isEmpty()){
 				try {
-					if (walkStopper.continueWalking())
+					if (walkStopper != null && walkStopper.continueWalking())
 						movementsFIFO.wait();
 					else
 						return null;
@@ -161,7 +174,8 @@ public class Grapher implements Runnable {
 				}
 			}
 			movement = movementsFIFO.removeFirst();; // Movements CONSUMER
-			System.out.println(movementsFIFO.size() + " pending movements while graphing: " + movement.toString());
+			graphing = true;
+			//System.out.println(movementsFIFO.size() + " pending movements while graphing: " + movement.toString());
 			movementsSync.add(movementsFIFO.size());
 		}
 		return movement;
@@ -169,6 +183,25 @@ public class Grapher implements Runnable {
 	
 	public static List<Integer> getMovementsSync(){
 		return movementsSync;
+	}
+	
+	/**
+	 * Sync TESTAR movements productions and graph movements consumption.
+	 */
+	public static void syncMovements(){
+		synchronized(movementsFIFO){
+			while(!movementsFIFO.isEmpty()){
+				try {
+					movementsFIFO.wait();
+				} catch (InterruptedException e) {}
+			}
+		}
+		while(graphing){
+			try {
+				TimeUnit.MILLISECONDS.sleep(10);
+			} catch (InterruptedException e) {}
+		}
+		return;
 	}
 	
 	/**
@@ -190,9 +223,16 @@ public class Grapher implements Runnable {
 		//System.out.println(wr);
 		env = new TESTAREnvironment();
 		if (testGenerator.equals(QLEARNING_GENERATOR)){
+			if (QLEARNING_CALIBRATION){
+				QLEARNING_DISCOUNT_PARAM = Math.random(); // 0.0 .. 1.0
+				QLEARNING_MAXREWARD_PARAM = Math.random() * MAX_MAXREWARD; // 0.0 .. MAX_MAXREWARD
+			}
 			walker = new QLearning(QLEARNING_DISCOUNT_PARAM, QLEARNING_MAXREWARD_PARAM);
 			System.out.println("<Q-Learning> test generator enabled (" +
 							   "discount = " + QLEARNING_DISCOUNT_PARAM + ", maxReward = " + QLEARNING_MAXREWARD_PARAM + ")");
+		} else if (testGenerator.equals(MAXCOVERAGE_GENERATOR)){
+			walker = new MaxCoverage(new Random(graphTime));
+			System.out.println("<MaxCoverage UI exploration> test generator enabled");			
 		} else{ // default: RANDOM_GENERATOR
 			walker = new RandomWalker(new Random(graphTime));
 			System.out.println("<Random> test generator enabled");			

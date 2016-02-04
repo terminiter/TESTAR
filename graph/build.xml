@@ -3,6 +3,7 @@
     <!-- properties -->
     <property name="src" location="src/"/>
     <property name="bin" location="bin/"/>
+	<property name="doc" location="doc/"/>
 	<property name="targetdir" location="target/"/>
     <property name="jarfile" value="graph.jar"/>
 	<property name="coreJarFile" location="../core/target/core.jar"/>	
@@ -30,6 +31,7 @@
 
     <target name="clean">
         <delete dir="${bin}"/>
+        <delete dir="${doc}"/>
         <delete dir="${targetdir}"/>
     </target>
 </project>

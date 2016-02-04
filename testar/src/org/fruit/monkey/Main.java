@@ -118,8 +118,10 @@ public class Main {
 			//logln("Monkey stopped execution.", Main.LogLevel.Critical);
 			//logln(Util.dateString("dd.MMMMM.yyyy HH:mm:ss"));
 			logln("TESTAR stopped execution at " + Util.dateString("dd.MMMMM.yyyy HH:mm:ss"), Main.LogLevel.Critical); // by urueda
-			if(log != null)
+			if(log != null){
 				log.flush();
+				log.close(); // by urueda
+			}
 			//if(settings != null && settings.get(ShowSettingsAfterTest))
 				//Runtime.getRuntime().exec("cmd /c start monkey.bat && exit");
 			Grapher.exit(); // by urueda
@@ -170,25 +172,51 @@ public class Main {
 			throw new ConfigException("Unable to load configuration file!", ioe);
 		}
 	}
+	
+	private static int loggedTimes = 0; // by urueda
+	
+	// by urueda
+	private static void logthis(String string, LogLevel level, boolean logln){
+		if(level.significance() <= logLevel){
+			if (logln)
+				System.out.println(string);
+			else
+				System.out.print(string);
+			if(log != null){
+				if (logln)
+					log.println(string);
+				else
+					log.print(string);
+			}
+			System.out.flush();
+			loggedTimes++;
+			if (loggedTimes > 9){ // save every 10 loggings
+				loggedTimes = 0;
+				log.flush();
+			}
+		}		
+	}
 
 	public static void logln(String string, LogLevel level){
-		if(level.significance() <= logLevel){
+		/*if(level.significance() <= logLevel){
 			System.out.println(string);
 			if(log != null)
 				log.println(string);
 			System.out.flush();
-		}
+		}*/
+		logthis(string,level,true); // refactor (by urueda)
 	}
 
 	public static void logln(String string){ logln(string, Main.LogLevel.Info); }
 
 	public static void log(String string, LogLevel level){
-		if(level.significance() <= logLevel){
+		/*if(level.significance() <= logLevel){
 			System.out.print(string);
 			if(log != null)
 				log.print(string);
 			System.out.flush();
-		}
+		}*/
+		logthis(string,level,false); // refactor (by urueda)
 	}
 
 	public static void log(String string){ log(string, Main.LogLevel.Info); }

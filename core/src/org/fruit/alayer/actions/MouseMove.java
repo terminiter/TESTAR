@@ -69,6 +69,16 @@ public final class MouseMove extends TaggableBase implements Action {
 		return "Move mouse to " + position.toString() + ".";
 	}
 
+	// by urueda
+	@Override
+	public String toString(Role... discardParameters) {
+		for (Role r : discardParameters){
+			if (r.name().equals(ActionRoles.MouseMove.name()))
+				return "Mouse moved";
+		}
+		return toString();
+	}	
+
 	public void run(SUT system, State state, double duration) {
 		try{
 			Assert.notNull(system, state);

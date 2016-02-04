@@ -61,7 +61,7 @@ public class SettingsDialog extends javax.swing.JFrame {
 	
 	private static final long serialVersionUID = 5156320008281200950L;
 	
-	public static final String TESTAR_VERSION = "1.1a";
+	public static final String TESTAR_VERSION = "1.2";
 	
 	String settingsFile;
 	Settings settings, ret;

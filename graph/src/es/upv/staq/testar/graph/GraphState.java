@@ -22,6 +22,8 @@ import java.util.Set;
 
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
+import org.fruit.alayer.Tags;
+import org.fruit.alayer.Verdict;
 
 /**
  * Represents a grah state.
@@ -44,6 +46,12 @@ public class GraphState implements IGraphState{
 	
 	private Set<IGraphAction> unexploredActions;
 	
+	private Verdict verdict;
+
+	/**
+	 * Constructor
+	 * @param name
+	 */
 	public GraphState(String name){
 		this(null,name);	
 	}
@@ -55,8 +63,13 @@ public class GraphState implements IGraphState{
 		//	this.state = null; // compression failed
 		this.stateShotPath = null;
 		this.name = name;
-		count = 1;
+		this.count = 1;	
 		this.unexploredActions = new HashSet<IGraphAction>();
+		if (state != null){
+			this.verdict = state.get(Tags.OracleVerdict, Verdict.OK);
+			if (this.verdict.severity() == Verdict.SEVERITY_OK)
+				this.verdict = null;
+		}
 	}
 	
 	/*@Override
@@ -106,6 +119,11 @@ public class GraphState implements IGraphState{
 		return this.unexploredActions;
 	}
 	
+	@Override
+	public Verdict getVerdict(){
+		return this.verdict;
+	}
+	
 	public int hashCode(){
 		return name.hashCode();
 	}
@@ -121,5 +139,5 @@ public class GraphState implements IGraphState{
 	public String toString(){
 		return name;
 	}
-	
+		
 }

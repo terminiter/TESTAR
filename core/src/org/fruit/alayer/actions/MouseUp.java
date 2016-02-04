@@ -53,6 +53,16 @@ public final class MouseUp extends TaggableBase implements Action {
 	
 	public String toString() { return "Release Mouse Button " + btn; }
 
+	// by urueda
+	@Override
+	public String toString(Role... discardParameters) {
+		for (Role r : discardParameters){
+			if (r.name().equals(ActionRoles.MouseUp.name()))
+				return "Mouse button released";
+		}
+		return toString();
+	}	
+
 	public void run(SUT system, State state, double duration) {
 		try{
 			Assert.notNull(system);

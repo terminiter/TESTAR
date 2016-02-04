@@ -31,6 +31,7 @@ import org.fruit.Assert;
 import org.fruit.Util;
 import org.fruit.alayer.ActionFailedException;
 import org.fruit.alayer.Action;
+import org.fruit.alayer.Role;
 import org.fruit.alayer.State;
 import org.fruit.alayer.SUT;
 import org.fruit.alayer.NoSuchTagException;
@@ -52,6 +53,16 @@ public final class KeyDown extends //TaggableBase
 	
 	public String toString() { return "Press Key " + key; }
 
+	// by urueda
+	@Override
+	public String toString(Role... discardParameters) {
+		for (Role r : discardParameters){
+			if (r.name().equals(ActionRoles.KeyDown.name()))
+				return "Key pressed";
+		}
+		return toString();
+	}
+	
 	// by urueda
 	@Override
 	protected void keyAction(SUT system, KBKeys key) {

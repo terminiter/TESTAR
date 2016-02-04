@@ -149,4 +149,13 @@ public class GraphAction implements IGraphAction {
 		return name;
 	}
 	
+	@Override
+	public IGraphAction clone(String cloneName){
+		GraphAction gaCloned = new GraphAction(null /*getAction()*/, cloneName, getActionType());
+		gaCloned.setDetailedName(getDetailedName());
+		gaCloned.setActionReward(getActionReward());
+		gaCloned.setStateshot(getStateshot());
+		return gaCloned;
+	}
+	
 }

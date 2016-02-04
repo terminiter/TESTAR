@@ -200,4 +200,10 @@ public final class MouseGesture extends TaggableBase implements Action {
 		return "(" + "UNDEF" + ")";
 	}	
 	
+	// by urueda
+	@Override
+	public String toString(Role... discardParameters) {
+		return toString();
+	}
+		
 }

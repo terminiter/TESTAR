@@ -39,6 +39,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 
@@ -62,6 +63,7 @@ import org.fruit.alayer.Taggable;
 import org.fruit.alayer.Rect;
 import org.fruit.alayer.StdState;
 import org.fruit.alayer.Tags;
+import org.fruit.alayer.Verdict;
 import org.fruit.alayer.Visualizer;
 import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.NOP;
@@ -73,17 +75,31 @@ public class SequenceViewer extends java.awt.Frame {
 	ObjectInputStream stream;
 	BufferedImage buffer = new BufferedImage(1024, 768, BufferedImage.TYPE_INT_ARGB);
 	int stateCount;
+	
+	// begin by urueda
+	private List<Taggable> cachedSequence;
+	private int sequenceViewIndex;
+	private static final int DIRECTION_NEXT = 1, DIRECTION_PREVIOUS = -1;
+	// end by urueda
 
 	public SequenceViewer(Settings settings) {
 		this.settings = settings;
 		initComponents();
 		this.setBounds(0, 0, 1024, 768);
+		// begin by urueda
+		this.setTitle("Sequence viewer"); // by urueda
+		cachedSequence = new ArrayList<Taggable>();
+		sequenceViewIndex = -1; stateCount = -1;
+		// end by urueda
 	}
 
 	private void initComponents() {
 		canvas1 = new java.awt.Canvas();
 		panel1 = new java.awt.Panel();
+		btnBegin = new java.awt.Button(); // by urueda
+		btnPrev = new java.awt.Button(); // by urueda
 		btnNext = new java.awt.Button();
+		btnEnd = new java.awt.Button(); // by urueda
 		lblInfo = new java.awt.Label();
 		panel2 = new java.awt.Panel();
 		scrollPane1 = new java.awt.ScrollPane();
@@ -112,6 +128,23 @@ public class SequenceViewer extends java.awt.Frame {
 			}
 		});
 
+		// begin by urueda
+		btnBegin.setLabel("Begin");
+		btnBegin.setName("");
+		btnBegin.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				btnBeginActionPerformed(evt);
+			}
+		});
+		btnPrev.setLabel("Previous");
+		btnPrev.setName("");
+		btnPrev.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				btnPrevActionPerformed(evt);
+			}
+		});
+		// end by urueda
+
 		btnNext.setLabel("Next");
 		btnNext.setName("");
 		btnNext.addActionListener(new java.awt.event.ActionListener() {
@@ -120,16 +153,29 @@ public class SequenceViewer extends java.awt.Frame {
 			}
 		});
 
-		lblInfo.setText("label1");
+		// begin by urueda
+		btnEnd.setLabel("End");
+		btnEnd.setName("");
+		btnEnd.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				btnEndActionPerformed(evt);
+			}
+		});
+		// end by urueda
+		
+		lblInfo.setText("");
 
 		javax.swing.GroupLayout panel1Layout = new javax.swing.GroupLayout(panel1);
 		panel1.setLayout(panel1Layout);
 		panel1Layout.setHorizontalGroup(
 				panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
 				.addGroup(panel1Layout.createSequentialGroup()
-						.addComponent(btnNext, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
+						.addComponent(btnBegin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE) // by urueda
+						.addComponent(btnPrev, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE) // by urueda
+						.addComponent(btnNext, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+						.addComponent(btnEnd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE) // by urueda
 						.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-						.addComponent(lblInfo, javax.swing.GroupLayout.DEFAULT_SIZE, 617, Short.MAX_VALUE)
+						.addComponent(lblInfo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE)
 						.addContainerGap())
 				);
 		panel1Layout.setVerticalGroup(
@@ -137,8 +183,11 @@ public class SequenceViewer extends java.awt.Frame {
 				.addGroup(panel1Layout.createSequentialGroup()
 						.addGroup(panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
 								.addComponent(lblInfo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-								.addComponent(btnNext, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-								.addGap(0, 10, Short.MAX_VALUE))
+								.addComponent(btnBegin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE) // by urueda
+								.addComponent(btnPrev, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE) // by urueda
+								.addComponent(btnNext, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+								.addComponent(btnEnd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE) // by urueda
+								.addGap(0, 10, Short.MAX_VALUE)))
 				);
 
 		add(panel1, java.awt.BorderLayout.NORTH);
@@ -153,20 +202,49 @@ public class SequenceViewer extends java.awt.Frame {
 
 		pack();
 		setVisible(true);
-		updateInfo("");
+		//updateInfo("");
 	}                      
 
 	private void exitForm(java.awt.event.WindowEvent evt) {                          
 		setVisible(false);
-	}                         
+	}
+	
+	// refactor by urueda
+	private void postActionPerformed(){
+		display.setBounds(0, 0, buffer.getWidth(), buffer.getHeight());
+		display.repaint();
+		display.paint(display.getGraphics());
+		pack();		
+	}
 
+	// by urueda
+	private void btnBeginActionPerformed(java.awt.event.ActionEvent evt) {                                        
+		try {
+			beginPic();
+			postActionPerformed();
+		} catch (IOException e1) {
+			throw new RuntimeException(e1);
+		} catch (ClassNotFoundException e1) {
+			throw new RuntimeException(e1);
+		}
+	}                	
+
+	// by urueda
+	private void btnPrevActionPerformed(java.awt.event.ActionEvent evt) {                                        
+		try {
+			prevPic();
+			postActionPerformed();
+		} catch (IOException e1) {
+			throw new RuntimeException(e1);
+		} catch (ClassNotFoundException e1) {
+			throw new RuntimeException(e1);
+		}
+	}                	
+	
 	private void btnNextActionPerformed(java.awt.event.ActionEvent evt) {                                        
 		try {
 			nextPic();
-			display.setBounds(0, 0, buffer.getWidth(), buffer.getHeight());
-			display.repaint();
-			display.paint(display.getGraphics());
-			pack();
+			postActionPerformed();
 		} catch (IOException e1) {
 			throw new RuntimeException(e1);
 		} catch (ClassNotFoundException e1) {
@@ -174,23 +252,20 @@ public class SequenceViewer extends java.awt.Frame {
 		}
 	}                
 
-
-	public void nextPic() throws IOException, ClassNotFoundException{
-		if(stream == null){
-			FileInputStream fis = new FileInputStream(new File(settings.get(PathToReplaySequence)));
-			//BufferedInputStream bis = new BufferedInputStream(fis);
-			BufferedInputStream bis = new BufferedInputStream(new GZIPInputStream(fis)); // by urueda
-			stream = new ObjectInputStream(bis);
+	// by urueda
+	private void btnEndActionPerformed(java.awt.event.ActionEvent evt) {                                        
+		try {
+			endPic();
+			postActionPerformed();
+		} catch (IOException e1) {
+			throw new RuntimeException(e1);
+		} catch (ClassNotFoundException e1) {
+			throw new RuntimeException(e1);
 		}
-
-		Taggable fragment = null;
-
-		try{
-			fragment = (Taggable) stream.readObject();
-		}catch(IOException ioe){
-			return;
-		}
-
+	}                	
+	
+	// refactor by urueda
+	public void movePic(Taggable fragment, int direction) throws IOException, ClassNotFoundException{
 		State state = fragment.get(Tags.SystemState, new StdState());
 
 		//Image img = state.get(Tags.Screenshot, null);
@@ -244,12 +319,103 @@ public class SequenceViewer extends java.awt.Frame {
 				}
 			}
 		}
+		Verdict verdict = fragment.get(Tags.OracleVerdict, null);
+		if (verdict != null){
+			Pen penVerdict = Pen.startFrom(Pen.DefaultPen)
+					.setColor(Color.Blue)
+					.setFillPattern(FillPattern.Stroke)
+					.setStrokeWidth(3.0)
+					.build();
+			verdict.visualizer().run(state, cv, penVerdict);
+		}
 		// end by urueda
 		cv.end();
-		stateCount++;
-		updateInfo(a.get(Tags.Desc, "<no description available>"));
+		
+		stateCount += direction; // by urueda
+		
+		updateInfo(a.get(Tags.Desc, "<no description available>"));		
+		
 	}
+
+	// by urueda
+	public void beginPic() throws IOException, ClassNotFoundException{
+		synchronized(cachedSequence){			
+			if (sequenceViewIndex <= 0)
+				return; // next must be invoked first! 
 	
+			int steps = sequenceViewIndex;
+			sequenceViewIndex = 0;		
+			movePic(cachedSequence.get(sequenceViewIndex),-steps); // refactor
+		}
+	}
+
+	// by urueda
+	public void prevPic() throws IOException, ClassNotFoundException{
+		synchronized(cachedSequence){			
+			if (sequenceViewIndex <= 0)
+				return; // next must be invoked first! 
+	
+			sequenceViewIndex--;		
+			movePic(cachedSequence.get(sequenceViewIndex),DIRECTION_PREVIOUS); // refactor
+		}
+	}
+
+	public void nextPic() throws IOException, ClassNotFoundException{
+		synchronized(cachedSequence){ // by urueda			
+			if(stream == null){
+				FileInputStream fis = new FileInputStream(new File(settings.get(PathToReplaySequence)));
+				//BufferedInputStream bis = new BufferedInputStream(fis);
+				BufferedInputStream bis = new BufferedInputStream(new GZIPInputStream(fis)); // by urueda
+				stream = new ObjectInputStream(bis);
+			}
+
+			Taggable fragment = null;
+
+			// begin by urueda
+			if (sequenceViewIndex < cachedSequence.size() - 1)
+				fragment = cachedSequence.get(sequenceViewIndex + 1);
+			else {
+				// end by urueda
+				try{
+					fragment = (Taggable) stream.readObject();
+					cachedSequence.add(fragment); // by urueda
+				} catch (IOException ioe){ return; }
+			}
+
+			// begin by urueda
+			sequenceViewIndex++;
+			movePic(fragment,DIRECTION_NEXT); // refactor
+			// end by urueda
+		}
+	}
+
+	// by urueda
+	public void endPic() throws IOException, ClassNotFoundException{
+		synchronized(cachedSequence){		
+			if(stream == null){
+				FileInputStream fis = new FileInputStream(new File(settings.get(PathToReplaySequence)));
+				//BufferedInputStream bis = new BufferedInputStream(fis);
+				BufferedInputStream bis = new BufferedInputStream(new GZIPInputStream(fis)); // by urueda
+				stream = new ObjectInputStream(bis);
+			}
+
+			int steps = cachedSequence.size() - sequenceViewIndex - 1;
+			sequenceViewIndex = cachedSequence.size() - 1;
+			
+			Taggable fragment = null;
+			try{
+				do{
+					fragment = (Taggable) stream.readObject();
+					cachedSequence.add(fragment); // by urueda
+					steps++;
+					sequenceViewIndex++;
+				}while(true); // til end of file
+			} catch (IOException ioe) { // end of file reached?
+				movePic(fragment == null ? cachedSequence.get(sequenceViewIndex) : fragment, steps); // refactor
+			}			
+		}
+	}	
+
 	public void updateInfo(String actionText){
 		lblInfo.setText("State: " + Integer.toString(stateCount) + "  Action: " + actionText);
 	}
@@ -261,7 +427,10 @@ public class SequenceViewer extends java.awt.Frame {
 			Util.pause(1);
 	}
 
+	private java.awt.Button btnBegin; // by urueda
+	private java.awt.Button btnPrev; // by urueda
 	private java.awt.Button btnNext;
+	private java.awt.Button btnEnd; // by urueda
 	private java.awt.Canvas canvas1;
 	private java.awt.Canvas display;
 	private java.awt.Label lblInfo;

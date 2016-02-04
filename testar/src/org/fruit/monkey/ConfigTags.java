@@ -75,6 +75,11 @@ public final class ConfigTags {
 	public static final Tag<Double> TimeToFreeze = Tag.from("TimeToFreeze", Double.class);
 	public static final Tag<Boolean> ShowSettingsAfterTest = Tag.from("ShowSettingsAfterTest", Boolean.class);
 	
-	public static final Tag<String> TestGenerator = Tag.from("TestGenerator", String.class); // by urueda
+	// begin by urueda
+	public static final Tag<String> TestGenerator = Tag.from("TestGenerator", String.class);
+	public static final Tag<String> MaxReward = Tag.from("MaxReward", String.class);
+	public static final Tag<String> Discount = Tag.from("Discount", String.class);
+	// end by urueda
+	
 	
 }

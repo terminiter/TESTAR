@@ -11,8 +11,8 @@
  * in the context of the TESTAR Proof of Concept project:                                *
  *               "UPV, Programa de Prueba de Concepto 2014, SP20141402"                  *
  * This graph project is distributed FREE of charge under the TESTAR license, as an open *
- * source project under the BSD3 licence (http://opensource.org/licenses/BSD-3-Clause)   *                                                                                        * 
- *                                                                                       *
+ * source project under the BSD3 licence (http://opensource.org/licenses/BSD-3-Clause)   *
+ *                                                                                       * 
  *****************************************************************************************/
 
 package es.upv.staq.testar.graph.algorithms;
@@ -44,7 +44,7 @@ public class RandomWalker extends AbstractWalker {
 
 	@Override
 	public Action selectAction(IEnvironment env, State state, Set<Action> actions) {
-		return new ArrayList<Action>(actions).get(rnd.nextInt(actions.size()));				
+		return new ArrayList<Action>(actions).get(rnd.nextInt(actions.size()));
 	}
 
 	@Override

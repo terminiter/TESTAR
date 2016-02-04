@@ -11,18 +11,20 @@
  * in the context of the TESTAR Proof of Concept project:                                *
  *               "UPV, Programa de Prueba de Concepto 2014, SP20141402"                  *
  * This graph project is distributed FREE of charge under the TESTAR license, as an open *
- * source project under the BSD3 licence (http://opensource.org/licenses/BSD-3-Clause)   *                                                                                        * 
+ * source project under the BSD3 licence (http://opensource.org/licenses/BSD-3-Clause)   *
  *                                                                                       *
  *****************************************************************************************/
 
 package es.upv.staq.testar.graph.algorithms;
 
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.Set;
 
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 
+import es.upv.staq.testar.graph.Grapher;
 import es.upv.staq.testar.graph.IEnvironment;
 import es.upv.staq.testar.graph.IGraphAction;
 import es.upv.staq.testar.graph.IGraphState;
@@ -45,11 +47,10 @@ public class QLearning extends AbstractWalker { // Q = Reward
 		this.discount = discount;
 	}
 
-	// warning: if graph movements consuming is out of sync with TESTAR movements producing ...
-	// ... then, we do not have op to date graph information (i.e. rewards, states/actions explored)
 	@Override
 	public Action selectAction(IEnvironment env, State state, Set<Action> actions) {
-		return selectProportionate(env, state, actions); // selectMax(env, state, actions);
+		Grapher.syncMovements(); // synchronize graph movements consumption for up to date rewards and states/actions exploration
+		return selectProportionate(env, state, actions);
 	}
 
 	@Override
@@ -85,11 +86,14 @@ public class QLearning extends AbstractWalker { // Q = Reward
 			}
 			frac += q;			
 		}
-		
-		return selection; // revise: may return null in some case?
+	
+		if (selection != null)
+			return selection;
+		else
+			return selectMax(env,state,actions); // proportionale selection failed
 	}
 
-	/*private Action selectMax(IEnvironment env, State state, Set<Action> actions){
+	private Action selectMax(IEnvironment env, State state, Set<Action> actions){
 		double maxDesirability = 0.0;
 		double q;
 		Action selection = null;
@@ -101,6 +105,6 @@ public class QLearning extends AbstractWalker { // Q = Reward
 			}
 		}
 		return selection;
-	}*/
+	}
 	
 }

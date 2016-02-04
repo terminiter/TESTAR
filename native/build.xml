@@ -1,0 +1,49 @@
+<project name="native" default="jar">
+    
+    <!-- properties -->
+    <property name="src" location="src/"/>
+    <property name="bin" location="bin/"/>
+	<property name="targetdir" location="target/"/>
+	<property name="resourcesdir" location="${targetdir}/resources"/>
+    <property name="jarfile" value="native.jar"/>
+	<property name="coreJarfile" location="../core/target/core.jar"/>
+	<property name="windowsJarFile" location="../windows/target/windows.jar"/>	
+	<target name="all" depends="jar"/>
+
+    <!-- targets -->	
+	<target name="dependencies">
+		<depend srcdir="${src}" destdir="${bin}" closure="yes" classpath = "${coreJarfile};${windowsJarFile}" />
+	</target>	
+	
+    <!-- targets -->
+    <target name="compile" depends="dependencies">
+        <ant antfile="build.xml" dir="../windows" target="jar" inheritAll="false"/>	
+        <mkdir dir="${bin}"/>
+        <javac classpath="${coreJarfile};${windowsJarFile}" sourcepath="" srcdir="${src}" destdir="${bin}" failonerror="true" verbose="no" listfiles="no"
+        	includeantruntime="false" debug="on" debuglevel="lines,vars,source"/>
+    </target>
+
+    <target name="jar" depends="compile">
+        <mkdir dir="${targetdir}"/>
+        <jar basedir="${bin}" destfile="${targetdir}/intermediate.jar"/>
+    	<zip destfile="${targetdir}/${jarfile}">
+    	    <zipfileset src="${windowsJarFile}"/>
+    		<zipfileset src="${targetdir}/intermediate.jar"/>
+		</zip>
+    	<delete file="${targetdir}/intermediate.jar"/>
+    	<mkdir dir="${resourcesdir}"/>
+    	<copy file="../windows/resources/msvcp100.dll" todir="${resourcesdir}"/>
+    	<copy file="../windows/resources/msvcr100.dll" todir="${resourcesdir}"/>
+    </target>
+
+    <target name="clean">
+        <delete dir="${bin}"/>
+        <delete dir="${doc}"/>    	
+        <delete dir="${targetdir}"/>
+    </target>
+	
+    <target name="cleanall" depends="dependencies, clean">
+        <ant antfile="build.xml" dir="../windows" target="clean" inheritAll="false"/>
+    </target>	
+	
+</project>

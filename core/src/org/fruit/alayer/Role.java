@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -57,7 +58,17 @@ public final class Role implements Serializable {
 	}
 	
 	// begin by urueda@STaQ
-    public static boolean isAnyOneOf(List<Widget> widgets, Role... oneOf) {
+    
+	public static boolean isOneOf(Role r, Collection<Role> oneOf){
+		Assert.notNull(r, oneOf);
+		for(Role o : oneOf){
+			if(r.isA(o))
+				return true;
+		}
+		return false;		
+	}
+	
+	public static boolean isAnyOneOf(List<Widget> widgets, Role... oneOf) {
         Role r;
 		for(Widget w : widgets) {
             r = w.get(Tags.Role, null);
@@ -71,6 +82,7 @@ public final class Role implements Serializable {
         }
         return false;
     }
+	
     // end by urueda@STaQ	
 		
 	public static Role from(String name, Role... inheritFrom){

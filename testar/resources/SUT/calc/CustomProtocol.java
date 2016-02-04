@@ -24,65 +24,47 @@
 
 /**
  *  @author Sebastian Bauersfeld
+ *  @author Urko Rueda Molina (protocol refactor & cleanup)
  */
-import static org.fruit.alayer.windows.UIARoles.*;
 
 import java.io.File;
-
 import java.util.Collections;
-
 import java.util.HashSet;
-
 import java.util.Set;
 
 import org.fruit.Assert;
-
 import org.fruit.Pair;
-
 import org.fruit.Util;
-
 import org.fruit.alayer.Action;
-
 import org.fruit.alayer.ActionBuildException;
-
 import org.fruit.alayer.ActionFailedException;
 import org.fruit.alayer.Color;
 import org.fruit.alayer.FillPattern;
 import org.fruit.alayer.Pen;
 import org.fruit.alayer.Role;
-
 import org.fruit.alayer.Roles;
-
 import org.fruit.alayer.SUT;
-
 import org.fruit.alayer.ShapeVisualizer;
 import org.fruit.alayer.State;
-
 import org.fruit.alayer.StateBuildException;
-
 import org.fruit.alayer.StrokePattern;
 import org.fruit.alayer.SystemStartException;
-
 import org.fruit.alayer.Verdict;
-
 import org.fruit.alayer.Visualizer;
 import org.fruit.alayer.Widget;
-
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
-
 import org.fruit.alayer.actions.StdActionCompiler;
-
 import org.fruit.alayer.devices.KBKeys;
-
-import static org.fruit.alayer.windows.UIATags.*;
 
 import static org.fruit.monkey.ConfigTags.*;
 
 import org.fruit.monkey.DefaultProtocol;
-
 import org.fruit.monkey.Settings;
-
 import org.fruit.alayer.Tags;
+
+import es.upv.staq.testar.NativeLinker;
+import es.upv.staq.testar.ClickFilterLayerProtocol;
+
 import static org.fruit.alayer.Tags.NotResponding;
 import static org.fruit.alayer.Tags.IsRunning;
 import static org.fruit.alayer.Tags.RunningProcesses;
@@ -94,7 +76,7 @@ import static org.fruit.alayer.Tags.Enabled;
 
 
 
-public class CustomProtocol extends DefaultProtocol {
+public class CustomProtocol extends ClickFilterLayerProtocol { // DefaultProtocol {
 
 
 	/** 
@@ -163,48 +145,17 @@ public class CustomProtocol extends DefaultProtocol {
 	 */
 	protected Verdict getVerdict(State state){
 
-		Assert.notNull(state);
-
-		//-------------------
-		// ORACLES FOR FREE
-		//-------------------
-
-		// if the SUT is not running, we assume it crashed
-		if(!state.get(IsRunning, false))
-			return new Verdict(1.0, "System is offline! I assume it crashed!");
-
-		// if the SUT does not respond within a given amount of time, we assume it crashed
-		if(state.get(NotResponding, false))
-			return new Verdict(0.8, "System is unresponsive! I assume something is wrong!");
-
-        //------------------------
-		// ORACLES ALMOST FOR FREE
-        //------------------------
-
-		String titleRegEx = settings().get(SuspiciousTitles);
-		
-		// search all widgets for suspicious titles
-		for(Widget w : state){
-			String title = w.get(Title, "");
-			if(title.matches(titleRegEx)){
-				Visualizer visualizer = Util.NullVisualizer;
-				
-				// visualize the problematic widget, by marking it with a red box
-				if(w.get(Tags.Shape, null) != null){
-					Pen redPen = Pen.newPen().setColor(Color.Red).setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build();
-					visualizer = new ShapeVisualizer(redPen, w.get(Tags.Shape), "Suspicious Title", 0.5, 0.5);
-				}
-				return new Verdict(1.0, "Discovered suspicious widget title: '" + title + "'.", visualizer);
-			}
-		}
+		Verdict verdict = super.getVerdict(state); // by urueda
+		// system crashes, non-responsiveness and suspicious titles automatically detected!
 		
 		//-----------------------------------------------------------------------------
 		// MORE SOPHISTICATED ORACLES CAN BE PROGRAMMED HERE (the sky is the limit ;-)
         //-----------------------------------------------------------------------------
 
+		// ... YOU MAY WANT TO CHECK YOUR CUSTOM ORACLES HERE ...
 		
-		// if everything was ok...
-		return Verdict.OK;
+		return verdict;
+		
 	}
 
 
@@ -221,76 +172,72 @@ public class CustomProtocol extends DefaultProtocol {
 
 	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
 
-		Assert.notNull(state);
+		Set<Action> actions = super.deriveActions(system,state); // by urueda
+		// unwanted processes, force SUT to foreground, ... actions automatically derived!
 
-		Set<Action> actions = Util.newHashSet();
-		
-		// create an action compiler, which helps us create actions, such as clicks, drag + drop, typing...
-
+		// create an action compiler, which helps us create actions, such as clicks, drag&drop, typing ...
 		StdActionCompiler ac = new AnnotatingActionCompiler();
-
-
-
-		// if there is an unwanted process running, kill it
-
-		String processRE = settings().get(ProcessesToKillDuringTest);
-
-		for(Pair<Long, String> process : state.get(RunningProcesses, Collections.<Pair<Long, String>>emptyList())){
-
-			if(process.right() != null && process.right().matches(processRE)){
-
-				actions.add(ac.killProcessByName(process.right(), 2));
-
-				return actions;
-
-			}
-
-		}
 		
-
-		// if the system is in the background force it into the foreground!
-
-		if(!state.get(Foreground, true) && system.get(SystemActivator, null) != null){
-
-			actions.add(ac.activateSystem());
-
-			return actions;
-
-		}
-
-
+		//----------------------
+		// BUILD CUSTOM ACTIONS
+		//----------------------
+		
 		// iterate through all widgets
-
 		for(Widget w : state){
 
 			if(w.get(Enabled, true) && !w.get(Blocked, false)){ // only consider enabled and non-blocked widgets
-				// create left clicks
-				if(isClickable(w))
-					actions.add(ac.leftClickAt(w));
+				
+				if (!blackListed(w)){  // do not build actions for tabu widgets  
+					
+					// left clicks
+					if(whiteListed(w) || isClickable(w))
+						actions.add(ac.leftClickAt(w));
+	
+					// type into text boxes
+					if(isTypeable(w))
+						actions.add(ac.clickTypeInto(w, this.getRandomText(widgetFormat(w))));
 
-				// type into text boxes
-				if(isTypeable(w))
-					actions.add(ac.clickTypeInto(w, getRandomText()));
-
+				}
+				
 			}
 
 		}
 
-
+		//----------------------------------
+		// THERE MUST ALMOST BE ONE ACTION!
+		//----------------------------------
 
 		// if we did not find any actions, then we just hit escape, maybe that works ;-)
-
 		if(actions.isEmpty())
-
 			actions.add(ac.hitKey(KBKeys.VK_ESCAPE));
-
-
-
+		
 		return actions;
 
 	}
 
-
+	// should the widget be clickable?
+	private boolean isClickable(Widget w){
+		Role role = w.get(Tags.Role, Roles.Widget);
+		if(!Role.isOneOf(role, NativeLinker.getNativeUnclickable())){
+			String title = w.get(Title, "");
+			if(!title.matches(settings().get(ClickFilter))){					
+				if(Util.hitTest(w, 0.5, 0.5))
+					return true;
+			}
+		}
+		return false;
+	}
+	
+	// should the widget be typeable?
+	private boolean isTypeable(Widget w){
+		Role role = w.get(Tags.Role, Roles.Widget);
+		if(Role.isOneOf(role, NativeLinker.getNativeTypeable()) && NativeLinker.isNativeTypeable(w)){
+			if(Util.hitTest(w, 0.5, 0.5))
+				return true;
+		}
+		return false;
+	}
+	
 	/**
 	 * Select one of the possible actions (e.g. at random)
 	 * @param state the SUT's current state
@@ -313,7 +260,9 @@ public class CustomProtocol extends DefaultProtocol {
 	 * @return whether or not the execution succeeded
 	 */
 	protected boolean executeAction(SUT system, State state, Action action){
+		
 		return super.executeAction(system, state, action);
+		
 	}
 	
 
@@ -335,7 +284,9 @@ public class CustomProtocol extends DefaultProtocol {
 	 * This method is invoked each time after the Rogue User finished the generation of a sequence.
 	 */
 	protected void finishSequence(File recordedSequence){
+		
 		super.finishSequence(recordedSequence);
+		
 	}
 
 
@@ -349,33 +300,6 @@ public class CustomProtocol extends DefaultProtocol {
 
 		return super.moreSequences();
 
-	}
-	
-	
-	private boolean isClickable(Widget w){
-		Role role = w.get(Tags.Role, Roles.Widget);
-		
-		if(!Role.isOneOf(role, UIASeparator, UIAToolBar, UIAToolTip, UIAMenuBar, 
-				UIAMenu, UIAHeader, UIATabControl, UIAPane, UIATree, UIAWindow, 
-				UIATitleBar, UIAThumb, UIAEdit, UIAText)){
-			String title = w.get(Title, "");
-
-			if(!title.matches(settings().get(ClickFilter))){					
-				if(Util.hitTest(w, 0.5, 0.5))
-					return true;
-			}
-		}
-		return false;
-	}
-	
-	private boolean isTypeable(Widget w){
-		Role role = w.get(Tags.Role, Roles.Widget);
-
-		if(Role.isOneOf(role, UIAEdit, UIAText) && w.get(UIAIsKeyboardFocusable)){
-			if(Util.hitTest(w, 0.5, 0.5))
-				return true;
-		}
-		return false;
 	}
 
 }

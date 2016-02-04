@@ -104,6 +104,16 @@ public final class Type extends TaggableBase implements Action {
 	
 	// by urueda
 	@Override
+	public String toString(Role... discardParameters) {
+		for (Role r : discardParameters){
+			if (r.name().equals(ActionRoles.Type.name()))
+				return "Text typed";
+		}
+		return toString();
+	}	
+
+	// by urueda
+	@Override
 	public String toShortString() {
 		Role r = get(Tags.Role, null);
 		if (r != null)
@@ -116,6 +126,6 @@ public final class Type extends TaggableBase implements Action {
 	@Override
 	public String toParametersString() {
 		return "(" + text + ")";
-	}	
+	}
 	
 }

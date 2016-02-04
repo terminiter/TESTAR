@@ -9,7 +9,7 @@
     <property name="doc" location="doc/"/>
     <property name="jarfile" value="testar.jar"/>
 	<property name="coreJarFile" location="../core/target/core.jar"/>
-	<property name="winJarFile" location="../windows/target/windows.jar"/>
+	<property name="nativeJarFile" location="../native/target/native.jar"/> <!-- by urueda -->
 	<property name="graphJarFile" location="../graph/target/graph.jar"/>
 	<property name="cmdParams" value="generate"/>
     <target name="all" depends="jar, doc"/>
@@ -17,17 +17,16 @@
 
     <!-- targets -->	
 	<target name="dependencies">
-		<depend srcdir="${src}" destdir="${bin}" closure="yes" classpath = "${coreJarFile};${winJarFile};${graphJarFile}" />
+		<depend srcdir="${src}" destdir="${bin}" closure="yes" classpath = "${coreJarFile};${nativeJarFile};${graphJarFile}" /> <!-- by urueda -->
 	</target>
 	
     <target name="compile" depends="dependencies">
         <ant antfile="build.xml" dir="../core" target="jar" inheritAll="false"/>
     	<ant antfile="build.xml" dir="../graph" target="jar" inheritAll="false"/>
-        <ant antfile="build.xml" dir="../windows" target="jar" inheritAll="false"/>
+        <ant antfile="build.xml" dir="../native" target="jar" inheritAll="false"/> <!-- by urueda -->
         <ant antfile="build.xml" dir="../suts/swtcalc" target="jar" inheritAll="false"/>
         <mkdir dir="${bin}"/>
-        <javac classpath="${lib}/jsyntaxpane-0.9.5-b29.jar;${coreJarFile};{${winJarFile};${graphJarFile};${lib}/JNativeHook.jar" sourcepath="" srcdir="${src}" destdir="${bin}" failonerror="true" verbose="no" listfiles="no"
-        	includeantruntime="false" debug="on" debuglevel="lines,vars,source"/>
+        <javac classpath="${lib}/jsyntaxpane-0.9.5-b29.jar;${coreJarFile};{${nativeJarFile};${graphJarFile};${lib}/JNativeHook.jar" sourcepath="" srcdir="${src}" destdir="${bin}" failonerror="true" verbose="no" listfiles="no" includeantruntime="false" debug="on" debuglevel="lines,vars,source"/> <!-- by urueda (native abstraction) -->
     	<mkdir dir="${bin}/resources/icons"/>
 		<copy todir="${bin}/resources/icons" >
 	   		<fileset dir="${resourcedir}/icons/"/>
@@ -47,7 +46,7 @@
         </jar>
     	<zip destfile="${targetdir}/${jarfile}">
     	    <zipfileset src="${coreJarFile}"/>
-    	    <zipfileset src="${winJarFile}"/>
+    	    <zipfileset src="${nativeJarFile}"/> <!-- by urueda -->
     		<zipfileset src="${graphJarFile}"/>
     		<zipfileset src="../graph/lib/com.alexmerz.graphviz.jar"/>
     		<zipfileset src="../graph/lib/jgrapht-jdk1.6.jar"/>
@@ -59,24 +58,34 @@
     	<copy file="${resourcedir}/testar.bat" todir="${targetdir}"/>
     	
     	<!-- start by urueda -->
-    	<copy file="../windows/resources/msvcp100.dll" todir="${targetdir}"/>
-    	<copy file="../windows/resources/msvcr100.dll" todir="${targetdir}"/>
+    	
+    	<copy todir="${targetdir}">
+    		<fileset dir="../native/target/resources/" />
+    	</copy>
     	<copy file="../LICENSE" todir="${targetdir}"/>
     	<copy file="../VERSION" todir="${targetdir}"/>
     	<copy file="../CHANGELOG" todir="${targetdir}"/>
-    	<!-- end by urueda -->
+    	<copy file="../KNOWN_ISSUES" todir="${targetdir}"/>
     	
     	<!-- wincalc -->
-    	
+		
     	<copy file="${resourcedir}/SUT/wincalc/test.settings" todir="${targetdir}"/>
     	<copy file="${resourcedir}/SUT/wincalc/CustomProtocol.java" todir="${targetdir}"/>
     	
 
-    	<!-- calc -->
+    	<!-- calc (on-purpose buggy crafted calculator) -->
     	<!--
     	<copy file="${resourcedir}/SUT/calc/test.settings" todir="${targetdir}"/>
     	<copy file="${resourcedir}/SUT/calc/CustomProtocol.java" todir="${targetdir}"/>
     	-->
+    	
+    	<!-- web (generic) -->
+		<!--
+    	<copy file="${resourcedir}/SUT/web_generic/webtest.settings" tofile="${targetdir}/test.settings"/>
+    	<copy file="${resourcedir}/SUT/web_generic/WebProtocol.java" todir="${targetdir}"/>
+    	-->
+    	    	    	    	
+    	<!-- end by urueda -->    	
     	
        <javac classpath="${targetdir}/${jarfile}" sourcepath="${targetdir}/*.java" srcdir="${targetdir}" destdir="${targetdir}" failonerror="true" verbose="no" listfiles="no"
         	includeantruntime="false" debug="on" debuglevel="lines,vars,source"/>
@@ -124,7 +133,7 @@
 	
     <target name="cleanall" depends="dependencies, clean">
         <ant antfile="build.xml" dir="../core" target="clean" inheritAll="false"/>
-        <ant antfile="build.xml" dir="../windows" target="clean" inheritAll="false"/>
+        <ant antfile="build.xml" dir="../native" target="cleanall" inheritAll="false"/> <!-- by urueda -->
     	<ant antfile="build.xml" dir="../graph" target="clean" inheritAll="false"/>
     </target>
 </project>

@@ -47,6 +47,8 @@ public interface IGraphAction extends Serializable {
 	public static final double UNEXPLORED = -1.0;
 
 	public double getActionReward();
-	public void setActionReward(double actionReward);	
+	public void setActionReward(double actionReward);
+	
+	public IGraphAction clone(String clonName);
 	
 }

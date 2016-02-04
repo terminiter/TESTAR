@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.WeakHashMap;
@@ -48,6 +49,8 @@ public class TESTAREnvironment implements IEnvironment {
 	private List<IGraphState> nongraphStates; // graph states not yet in graph
 	private List<IGraphAction> nongraphActions; // graph actions not yet in graph
 	
+	private List<int[]> explorationCurve; // [0] unique_states, [1] unique_actions, [2] abstract_states, [3] abstract_actions
+	
 	public TESTAREnvironment(){
 		this(TESTARGraph.buildEmptyGraph());
 		this.pendingUpdates = new HashMap<String,Set<Action>>();
@@ -55,6 +58,7 @@ public class TESTAREnvironment implements IEnvironment {
 		this.graphActions = new WeakHashMap<String,IGraphAction>();
 		this.nongraphStates = new ArrayList<IGraphState>();
 		this.nongraphActions = new ArrayList<IGraphAction>();
+		this.explorationCurve = new ArrayList<int[]>();
 	}
 	
 	public TESTAREnvironment(TESTARGraph g){
@@ -66,8 +70,12 @@ public class TESTAREnvironment implements IEnvironment {
 		return Grapher.getMovement();
 	}	
 	
-	private synchronized IGraphState exists(State state){
+	private IGraphState exists(State state){
 		String stateID = CodingManager.codify(state);
+		return existsState(stateID);
+	}
+	
+	private synchronized IGraphState existsState(String stateID){
 		IGraphState graphState = this.graphStates.get(stateID);
 		if (graphState != null)
 			return graphState;
@@ -81,11 +89,15 @@ public class TESTAREnvironment implements IEnvironment {
 			if (gs.toString().equals(stateID))
 				return gs;
 		}
-		return null;
+		return null;		
 	}
 	
-	private synchronized IGraphAction exists(String stateID, Action action){
+	private IGraphAction exists(String stateID, Action action){
 		String stateactionID = CodingManager.codify(stateID,action);
+		return existsAction(stateactionID);
+	}
+	
+	private synchronized IGraphAction existsAction(String stateactionID){
 		IGraphAction graphAction = this.graphActions.get(stateactionID);
 		if (graphAction != null)
 			return graphAction;
@@ -160,7 +172,7 @@ public class TESTAREnvironment implements IEnvironment {
 	}
 
 	@Override
-	public void populateEnvironment(IGraphState fromState, IGraphAction action, IGraphState toState) {			
+	public void populateEnvironment(IGraphState fromState, IGraphAction action, IGraphState toState) {
 		if (g.vertexSet().size() == 0){ // first SUT state
 			IGraphState startState = new GraphState("ENTRY");
 			g.addVertex(startState);
@@ -174,6 +186,7 @@ public class TESTAREnvironment implements IEnvironment {
 		updateAvailableActions(toState);
 		g.addEdge(this, fromState, toState, action);
 		purgeNongraphAction(action);
+		sampleExploration();
 	}	
 	
 	@Override
@@ -259,6 +272,54 @@ public class TESTAREnvironment implements IEnvironment {
 		return gas;
 	}	
 	
+	private boolean stateAtGraph(String stateID){
+		for (IGraphState gs : g.vertexSet()){
+			if (gs.toString().equals(stateID))
+				return true;
+		}
+		return false;
+	}	
+	
+	@Override
+	public HashMap<String,Set<String>> getGraphStateClusters(){
+		Set<String> clusterStates;
+		HashMap<String,Set<String>> stateClusters = CodingManager.getStateClusters();
+		for (String cluster : stateClusters.keySet().toArray(new String[stateClusters.size()])){
+			clusterStates = stateClusters.get(cluster);
+			for (String state : clusterStates.toArray(new String[clusterStates.size()])){
+				if (!stateAtGraph(state))
+					clusterStates.remove(state);
+			}
+			if (clusterStates.isEmpty())
+				stateClusters.remove(cluster);
+		}
+		return stateClusters;
+	}
+	
+	private boolean actionAtGraph(String stateactionID){
+		for (IGraphAction ga : g.edgeSet()){
+			if (ga.toString().equals(stateactionID))
+				return true;
+		}
+		return false;
+	}
+	
+	@Override
+	public HashMap<String,Set<String>> getGraphActionClusters(){
+		Set<String> clusterActions;
+		HashMap<String,Set<String>> actionClusters = CodingManager.getActionClusters();
+		for (String cluster : actionClusters.keySet().toArray(new String[actionClusters.size()])){
+			clusterActions = actionClusters.get(cluster);
+			for (String action : clusterActions.toArray(new String[clusterActions.size()])){
+				if (!actionAtGraph(action))
+					clusterActions.remove(action);
+			}
+			if (clusterActions.isEmpty())
+				actionClusters.remove(cluster);
+		}
+		return actionClusters;
+	}	
+	
 	@Override
 	public void finishGraph(boolean walkStatus,
 							IGraphState lastState,
@@ -271,6 +332,28 @@ public class TESTAREnvironment implements IEnvironment {
 		IGraphState v = new GraphState(null, walkStatus ? "PASS" : "FAIL");
 		g.addVertex(this, v);
 		g.addEdge(this, weState, v, new GraphAction("STOP"));
+	}
+	
+	private int sampleExplorationCount = 0;
+	private final int EXPLORATION_SAMPLE_INTERVAL = 100;
+	private void sampleExploration(){
+		sampleExplorationCount++;
+		if (sampleExplorationCount % EXPLORATION_SAMPLE_INTERVAL == 0){
+			int[] sample = new int[]{
+				g.vertexSet().size() - 1, // without start state
+				g.edgeSet().size() - 1, // without start edges
+				getGraphStateClusters().size(), // abstract states
+				getGraphActionClusters().size() // abstract actions
+			};
+			explorationCurve.add(sample);
+			System.out.println("ExplorationCurve (unique states/actions, abstract states/actions): " + 
+							   sample[0] + ", " + sample[1] + ", " + sample[2] + ", " + sample[3]);
+		}
+	}
+	
+	@Override
+	public List<int[]> getExplorationCurve(){
+		return explorationCurve;
 	}
 	
 	@Override

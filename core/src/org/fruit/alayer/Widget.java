@@ -65,4 +65,6 @@ public interface Widget extends Taggable, Serializable {
 	 */
 	public String getRepresentation(String tab);
 	
+	public abstract String toString(Tag<?>... tags);
+	
 }

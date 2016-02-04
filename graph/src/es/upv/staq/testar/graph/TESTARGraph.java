@@ -18,9 +18,14 @@
 package es.upv.staq.testar.graph;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.jgrapht.graph.DirectedMultigraph;
+
+import es.upv.staq.testar.CodingManager;
 
 /**
  * Graph representation for TESTAR.
@@ -32,6 +37,9 @@ public class TESTARGraph extends DirectedMultigraph<IGraphState, IGraphAction> {
 
 	private static final long serialVersionUID = -6766749840561297953L;
 	
+	private Boolean vertexSem = new Boolean(true);
+	private Boolean edgeSem = new Boolean(false);
+	
 	List<IGraphAction> orderedSequenceActions;
 	int actionOrder = -1;
 
@@ -40,10 +48,10 @@ public class TESTARGraph extends DirectedMultigraph<IGraphState, IGraphAction> {
 		orderedSequenceActions = new ArrayList<IGraphAction>();
 		actionOrder = 0;
 	}
-		
+
 	// by urueda
 	public static TESTARGraph buildEmptyGraph(){
-		return new TESTARGraph();
+		return new TESTARGraph();		
 	}
 
 	/*public static TESTARGraph GenerateGraph(String s){
@@ -89,13 +97,22 @@ public class TESTARGraph extends DirectedMultigraph<IGraphState, IGraphAction> {
 	    
 	    return null;
 	}*/
-		
+	
+	@Override
+	public Set<IGraphState> vertexSet(){
+		synchronized(vertexSem){
+			return new HashSet<IGraphState>(super.vertexSet());
+		}
+	}
+	
 	public boolean addVertex(IEnvironment env, IGraphState v){
-		if (this.containsVertex(v)){
-			v.incCount();
-			return false;
-		} else {
-			return super.addVertex(v);
+		synchronized(vertexSem){
+			if (this.containsVertex(v)){
+				v.incCount();
+				return false;
+			} else {
+				return super.addVertex(v);
+			}
 		}
 	}
 	
@@ -104,27 +121,42 @@ public class TESTARGraph extends DirectedMultigraph<IGraphState, IGraphAction> {
 		e.addOrder(new Integer(actionOrder).toString());
 		orderedSequenceActions.add(e);
 	}
-		
+
+	@Override
+	public Set<IGraphAction> edgeSet(){
+		synchronized(edgeSem){
+			return new HashSet<IGraphAction>(super.edgeSet());
+		}
+	}
+	
+	private int mutationIdx = 1;
+	
 	/**
 	 * Note: edge nodes must be added first.
 	 * @see public boolean addVertex(IEnvironment env, IGraphState v)
 	 */
 	public boolean addEdge(IEnvironment env, IGraphState from, IGraphState to, IGraphAction e){
-		boolean edgeAtGraph = true;
-		if (this.containsEdge(e)){ // the edge already exists at graph
-			edgeAtGraph &= this.getEdgeSource(e).toString().equals(from.toString()); // and the edge source state is the same
-			edgeAtGraph &= this.getEdgeTarget(e).toString().equals(to.toString()); // but, edge target state might be different (perhaps because the SUT did not react on time to action)
-		} else
-			edgeAtGraph = false;
-		if (edgeAtGraph){
-			e.incCount();
-			edgeAdded(e);
-			return false;			
-		} else{
-			if (!e.getActionName().equals("START") && !e.getActionName().equals("STOP"))
+		synchronized(edgeSem){
+			boolean edgeAtGraph = true, edgeMutated = false;
+			if (this.containsEdge(e)){ // the edge already exists at graph?
+				edgeAtGraph &= getEdgeSource(e).toString().equals(from.toString()); // and the edge source state is the same?
+				edgeAtGraph &= getEdgeTarget(e).toString().equals(to.toString()); // and the edge target state is the same? 
+				if (!edgeAtGraph)
+					edgeMutated = true; // linked states changed! (maybe the SUT did not react on time to actions)	
+			} else
+				edgeAtGraph = false;
+			if (edgeAtGraph){
+				e.incCount();
 				edgeAdded(e);
-			return super.addEdge(from,to,e);
-		}		
+				return false;
+			} else{
+				IGraphAction ga = edgeMutated ? e.clone(e.toString() + "_MUTATED_" + mutationIdx++) // keep the graph completely connected
+											  : e;
+				if (!e.getActionName().equals("START") && !e.getActionName().equals("STOP"))
+					edgeAdded(ga);
+				return super.addEdge(from, to, ga);
+			}
+		}
 	}
 	
 	public List<IGraphAction> getOrderedActions(){

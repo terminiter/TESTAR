@@ -96,6 +96,10 @@ public final class Tags {
 	/** ZIndex of a widget (objects with higher values are drawn on top of objects with lower values) */
 	public static final Tag<Double> ZIndex = from("ZIndex", Double.class);
 	
+	// by urueda
+	/** Related to slides (from_Position -> to_Position) */
+	public static final Tag<Position[]> Slider = from("Slider", Position[].class);;
+	
 	/** Usually attached to systems. Determines whether a system is non-responsive (hanging)
 	 * This does not necessarily mean that the system crashed, it could just process certain tasks. */
 	public static final Tag<Boolean> NotResponding = from("NotResponding", Boolean.class);

@@ -67,6 +67,18 @@ public interface Action extends Taggable, Serializable {
 	 * @throws ActionFailedException
 	 */
 	void run(SUT system, State state, double duration) throws ActionFailedException;
+
+	/**
+	 * @param action An action (from unknown state).
+	 * @param tab A tabulator for indentation.
+	 * @return A string representation for the action.
+	 *   [0] = Extended representation
+	 *   [1] = Compact representation
+	 * @author urueda
+	 */
+	public static String[] getActionRepresentation(Action action, String tab){
+		return getActionRepresentation(null,action,tab);
+	}
 		
 	/**
 	 * @param state A SUT state.
@@ -87,21 +99,23 @@ public interface Action extends Taggable, Serializable {
 				actionRole == null ? "??" : BriefActionRolesMap.map.get(actionRole.toString()));
 		}
 
-		List<Finder> targets = action.get(Tags.Targets, null);
-		if (targets != null){
-			String title;
-			Role widgetRole;
-			Widget w;
-			for (Finder f : targets){
-				w = f.apply(state);
-				if (w != null){
-					returnS[0] += tab + "TARGET = " + w.getRepresentation("\t\t");				
-					widgetRole = w.get(Tags.Role, null);
-					title = w.get(Tags.Title, null);
-					returnS[1] += String.format("( %1$" + CodingManager.ID_LENTGH + "s, %2$11s, %3$s )",
-							CodingManager.codify(w),
-							widgetRole == null ? "???" : widgetRole.toString(),
-							title == null ? "\"\"" : title);
+		if (state != null){
+			List<Finder> targets = action.get(Tags.Targets, null);
+			if (targets != null){
+				String title;
+				Role widgetRole;
+				Widget w;
+				for (Finder f : targets){
+					w = f.apply(state);
+					if (w != null){
+						returnS[0] += tab + "TARGET = " + w.getRepresentation("\t\t");				
+						widgetRole = w.get(Tags.Role, null);
+						title = w.get(Tags.Title, null);
+						returnS[1] += String.format("( %1$" + CodingManager.ID_LENTGH + "s, %2$11s, %3$s )",
+								CodingManager.codify(w),
+								widgetRole == null ? "???" : widgetRole.toString(),
+								title == null ? "\"\"" : title);
+					}
 				}
 			}
 		}
@@ -137,5 +151,8 @@ public interface Action extends Taggable, Serializable {
 	 * @author urueda
 	 */
 	String toParametersString();
+	
+	// by urueda
+	public abstract String toString(Role... discardParameters);
 	
 }

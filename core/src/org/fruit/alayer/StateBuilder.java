@@ -33,5 +33,7 @@ import java.io.Serializable;
  * A StateBuilder fetches an <code>SUT</code>'s current state.
  */
 public interface StateBuilder extends Serializable{
-    State apply(SUT system) throws StateBuildException;
+
+	State apply(SUT system) throws StateBuildException;
+    	
 }

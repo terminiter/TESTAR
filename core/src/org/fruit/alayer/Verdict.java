@@ -37,9 +37,22 @@ import org.fruit.Util;
  */
 public final class Verdict implements Serializable {
 	private static final long serialVersionUID = 3517681535425699094L;
-	public static final Verdict OK = new Verdict(0.0, "No problem detected.", Util.NullVisualizer);
-	private final String info;
-	private final double severity;
+
+	//public static final Verdict OK = new Verdict(0.0, "No problem detected.", Util.NullVisualizer);
+
+	// begin by urueda
+	public static final double SEVERITY_MIN = 0.0;
+	public static final double SEVERITY_MAX = 1.0;
+	public static final double SEVERITY_OK = SEVERITY_MIN;
+	public static final double SEVERITY_WARNING = 0.00000001; // must be less than FAULT THRESHOLD @test.settings
+	public static final Verdict OK = new Verdict(SEVERITY_OK, "No problem detected.", Util.NullVisualizer);
+	public static final Verdict FAIL = new Verdict(SEVERITY_MAX, "SUT failed.", Util.NullVisualizer);
+	// end by urueda
+		
+	//private final String info;
+	private String info; // by urueda (enable joins)
+	//private final double severity;
+	private double severity; // by urueda (enable joins)
 	private final Visualizer visualizer;
 	
 	public Verdict (double severity, String info){
@@ -47,7 +60,8 @@ public final class Verdict implements Serializable {
 	}
 	
 	public Verdict(double severity, String info, Visualizer visualizer){
-		Assert.isTrue(severity >= 0 && severity <= 1.0);
+		//Assert.isTrue(severity >= 0 && severity <= 1.0);
+		Assert.isTrue(severity >= SEVERITY_MIN && severity <= SEVERITY_MAX); // by urueda
 		Assert.notNull(info, visualizer);
 		this.severity = severity;
 		this.info = info;
@@ -65,7 +79,7 @@ public final class Verdict implements Serializable {
 	 * @return
 	 */
 	public String info(){ return info; }
-	
+		
 	/**
 	 * This visualizer should visualize the part of the state where the problem occurred.
 	 * For example: If there is a suspicious control element, like f.e. a critical message box
@@ -74,4 +88,18 @@ public final class Verdict implements Serializable {
 	 */
 	public Visualizer visualizer(){ return visualizer; }
 	public String toString(){ return "severity: " + severity + " info: " + info; }
+	
+	/**
+	 * Retrieves the verdict result of joining two verdicts.
+	 * @param verdict A verdict to join to current verdict.
+	 * @return The joined verdict.
+	 * @author: urueda
+	 */
+	public Verdict join(Verdict verdict){
+		if (!this.info.contains(verdict.info))
+			this.info = (this.severity == SEVERITY_OK ? "" : this.info + "\n") + verdict.info();
+		this.severity = Math.max(this.severity, verdict.severity());
+		return this;
+	}
+		
 }

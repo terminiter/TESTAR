@@ -41,8 +41,15 @@ import org.fruit.alayer.Tags;
 public class NOP extends TaggableBase implements Action {
 	private static final long serialVersionUID = 8622084462407313716L;
 	public void run(SUT system, State state, double duration){ Util.pause(duration); }
-	public String toString(){ return "No Operation"; }
 	
+	public String toString(){ return "No Operation"; }
+
+	// by urueda
+	@Override
+	public String toString(Role... discardParameters) {
+		return toString();
+	}
+
 	// by urueda
 	@Override
 	public String toShortString() {

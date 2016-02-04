@@ -134,9 +134,9 @@ public final class Util {
 	}
 
 	public static Point relToAbs(Shape shape, double relX, double relY){
-		return Point.from(shape.x() + shape.width() * relX, shape.y() + shape.height() * relY);
+		return Point.from(relToAbsX(shape,relX), relToAbsY(shape,relY));
 	}
-
+	
 	// by urueda
 	public static Point absToRel(Shape shape, double absX, double absY){
 		return Point.from(absToRelX(shape,absX), absToRelY(shape,absY));
@@ -152,12 +152,12 @@ public final class Util {
 
 	// by urueda
 	public static double absToRelX(Shape shape, double absX){
-		return Math.floor(Math.abs(absX - shape.x()) / shape.width());
+		return Math.ceil(Math.abs(absX - shape.x()) / shape.width());
 	}
 
 	// by urueda
 	public static double absToRelY(Shape shape, double absY){
-		return Math.floor(Math.abs(absY - shape.y()) / shape.height());
+		return Math.ceil(Math.abs(absY - shape.y()) / shape.height());
 	}
 
 	public static boolean contains(Widget widget, double x, double y){
@@ -380,7 +380,7 @@ public final class Util {
 				sb.append(' ');
 
 			for(Tag<?> t : tags)
-				sb.append(w.get(t, null)).append(", ");					
+				sb.append(w.get(t, null)).append(", ");
 
 			sb.append(Util.lineSep());
 		}

@@ -21,6 +21,7 @@ import java.io.Serializable;
 import java.util.Set;
 
 import org.fruit.alayer.Action;
+import org.fruit.alayer.Verdict;
 
 public interface IGraphState extends Serializable {
 	
@@ -37,5 +38,7 @@ public interface IGraphState extends Serializable {
 										Set<IGraphAction> exploredActions);
 	
 	public Set<IGraphAction> getUnexploredActions();
+	
+	public Verdict getVerdict();
 	
 }
