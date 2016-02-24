@@ -17,18 +17,26 @@ Test your system from the GUI:
 ## Releases
 
 **TESTAR v1.2**: https://github.com/STaQ-PROS-UPV/TESTAR/releases/tag/1.2
+
+Requirements:
+* Java JDK/JRE 1.8 x64 (protocol compilation will require JDK)
+* tools/graphviz-2.38 (optional, dot.exe is used for .dot to .svg graphs conversion)
+
+What is new?:
 * Test protocol filtering addon
 * SUT UI exploration curve
 * Abstracted minimal graphs, and more:
 http://webtestar.dsic.upv.es/upcoming/abstract_minimal_graph.svg
-* ...
+* and more
 
 **TESTAR v1.1a**: https://github.com/STaQ-PROS-UPV/TESTAR/releases/tag/v1.1a
+
 Requirements:
 * Java JDK/JRE 1.8 x64 (protocol compilation will require JDK)
 * tools/graphviz-2.38 (optional, dot.exe is used for .dot to .svg graphs conversion)
 
 **First public release**: https://github.com/STaQ-PROS-UPV/TESTAR/releases/tag/v1.0
+
 Requirements:
 * Java JDK/JRE 1.7 x64 (protocol compilation will require JDK)
 
