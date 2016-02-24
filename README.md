@@ -47,6 +47,27 @@ Requirements:
 Requirements: Windows 7, JDK 1.8, Apache Ant, Microsoft SDK 7.1
 
 How to:
-* build: run "ant" on /testar
-* run: run "testar.bat" on /testar/target
-* clean: run "ant cleanall" on /testar
+* build:
+
+run "ant" on /testar
+
+* run:
+
+run "testar.bat" on /testar/target
+
+* clean:
+
+run "ant cleanall" on /testar
+
+## TESTAR packages API:
+* core:
+
+http://htmlpreview.github.io/?https://github.com/STaQ-PROS-UPV/TESTAR/blob/master/core/doc/index.html
+
+* windows:
+
+http://htmlpreview.github.io/?https://github.com/STaQ-PROS-UPV/TESTAR/blob/master/windows/doc/index.html
+
+* testar:
+
+http://htmlpreview.github.io/?https://github.com/STaQ-PROS-UPV/TESTAR/blob/master/testar/doc/index.html
