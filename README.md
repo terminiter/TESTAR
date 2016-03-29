@@ -7,7 +7,7 @@
 
 * NO TEST SCRIPTS: No test scripts are recorded!, so no test script maintenance! Tests are generated and executed on the fly! When your UI changes, so do your tests!
 
-**website**: http://webtestar.dsic.upv.es
+**website**: http://www.testar.org
 
 **LICENSE**: TESTAR is distributed FREE of charge as an open source project under the [BSD-3 license](http://opensource.org/licenses/BSD-3-Clause)
 
