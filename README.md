@@ -1,7 +1,5 @@
 # ![logo](/resources/logos/TESTAR.png)
->Automated system testing of desktop, web and mobile applications at the GUI level
-
-AUTOMATED ROBUSTNESS TESTING AT THE UI LEVEL:
+>AUTOMATED ROBUSTNESS TESTING AT THE UI LEVEL:
 
 * START TESTING INMEDIATELY: With TESTAR, you can start testing immediately!! TESTAR automatically generates and executes test sequences based on a structure that is automatically derived from the UI through the accessibility API. TESTAR can detect the violation of general-purpose system requirements through implicit oracles.
 
