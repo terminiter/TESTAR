@@ -1,12 +1,13 @@
 # ![logo](/resources/logos/TESTAR.png)
 >Automated system testing of desktop, web and mobile applications at the GUI level
 
-Test your system from the GUI:
+AUTOMATED ROBUSTNESS TESTING AT THE UI LEVEL:
 
-* No more Capture/Replay script maintenance!
-* No more boring testing tasks!
-* Just concentrate on the important stuff and let the tool do the rest for you!
-* Simple, automated, and open source: TESTAR!
+* START TESTING INMEDIATELY: With TESTAR, you can start testing immediately!! TESTAR automatically generates and executes test sequences based on a structure that is automatically derived from the UI through the accessibility API. TESTAR can detect the violation of general-purpose system requirements through implicit oracles.
+
+* BUILD REQUIREMENTS INCREMENTALLY: While your application is automatically being tested for stability, crashes and undesired outputs, you can start adding more and more oracles that test more specific requirements of our application. This way we incrementally create the requirements, this is something that turns out to be very helpful when dealing with legacy systems.
+
+* NO TEST SCRIPTS: No test scripts are recorded!, so no test script maintenance! Tests are generated and executed on the fly! When your UI changes, so do your tests!
 
 **website**: http://webtestar.dsic.upv.es
 
@@ -59,7 +60,7 @@ run "testar.bat" on /testar/target
 
 run "ant cleanall" on /testar
 
-## TESTAR packages API:
+## TESTAR API:
 * core:
 
 http://htmlpreview.github.io/?https://github.com/STaQ-PROS-UPV/TESTAR/blob/master/core/doc/index.html
